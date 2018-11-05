@@ -1,0 +1,143 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-06-25 12:22+0300\n"
+"PO-Revision-Date: 2015-08-28 15:51+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.1\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "&Cancel"
+msgstr "Отмена"
+
+msgid "Abort"
+msgstr "Отменить"
+
+msgid "Actions"
+msgstr "Действия"
+
+msgid "All"
+msgstr "Все"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Clear application log"
+msgstr "Очистить журнал приложения"
+
+msgid "Clear log"
+msgstr "Очистить журнал"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Config"
+msgstr "Настройки"
+
+msgid "Configure"
+msgstr "Настроить"
+
+msgid "Confirmation"
+msgstr "Подтверждение"
+
+msgid "Custom"
+msgstr "Пользовательское"
+
+msgid "Data"
+msgstr "Данные"
+
+msgid "Debug"
+msgstr "Отладка"
+
+msgid "Dump log"
+msgstr "Выгружать журнал"
+
+msgid "Error"
+msgstr "Ошибка"
+
+msgid "File"
+msgstr "Файл"
+
+msgid "File:"
+msgstr "Файл:"
+
+msgid "Folder:"
+msgstr "Папка:"
+
+msgid "Ignore"
+msgstr "Игнорировать"
+
+msgid "Information"
+msgstr "Информация"
+
+msgid "Level"
+msgstr "Уровень"
+
+msgid "Log dump folder"
+msgstr "Папка выгрузки журнала"
+
+msgid "Message"
+msgstr "Сообщение"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "No to all"
+msgstr "Нет, на все"
+
+msgid "OK"
+msgstr "ОК"
+
+msgid "Page already exists"
+msgstr "Страница уже существует"
+
+msgid "Page is not found"
+msgstr "Страница не найдена"
+
+msgid "Perform log automatic dump to file"
+msgstr "Автоматически выгружать журнал в файл"
+
+msgid "Ready"
+msgstr "Готово"
+
+msgid "Retry"
+msgstr "Заново"
+
+msgid "Save application log to file"
+msgstr "Сохранить журнал приложения в файл"
+
+msgid "Save log"
+msgstr "Сохранить журнал"
+
+msgid "Select dump folder for automatic log dump"
+msgstr "Выберите папку для автоматической выгрузки журнала"
+
+msgid "Select folder to dump log file to"
+msgstr "Выбрать папку для записи файла журнала"
+
+msgid "Select log dump folder"
+msgstr "Папка для журналирования"
+
+msgid "Timestamp"
+msgstr "Врем. метка"
+
+msgid "Warning"
+msgstr "Предупреждение"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid "Yes to all"
+msgstr "Да, на все"
