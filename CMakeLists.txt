@@ -1,5 +1,5 @@
 # top-level cmakefile for ekosfera frameworkGui
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.10)
 project(frameworkGui)
 
 set(ESFWX_STANDALONE_BUILD 0 CACHE BOOL "Build GUI framework components as part of some project (Default - 0), or as stand-alone (1)")
@@ -8,9 +8,9 @@ set(ESFWX_STANDALONE_BUILD 0 CACHE BOOL "Build GUI framework components as part 
 set(frameworkGuiVendor			"ECO-Electronics" CACHE INTERNAL "")
 set(frameworkGuiVendorShort "ECO-E" CACHE INTERNAL "")
 set(frameworkGui						"ECO-E GUI framework" CACHE INTERNAL "")
-set(frameworkGuiCopyright	  "Copyright 2009-2017" CACHE INTERNAL "")
+set(frameworkGuiCopyright	  "Copyright 2009-2018" CACHE INTERNAL "")
 set(frameworkGui_VER_MAJOR	1 CACHE INTERNAL "")
-set(frameworkGui_VER_MINOR	23 CACHE INTERNAL "")
+set(frameworkGui_VER_MINOR	24 CACHE INTERNAL "")
 set(frameworkGui_BUILD_NUM	0 CACHE INTERNAL "")	
 
 # frameworkGui version file generation
