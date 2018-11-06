@@ -62,10 +62,12 @@ wxString EsListViewModel::fieldTextGet(ulong recIdx, ulong idx) const
 {
   const EsVariant& data = fieldDataGet(recIdx, idx);
 
-  if(data.isString())
+  if( data.isString() )
     return data.doInterpretAsString().c_str();
-  else
+  else if( !data.isEmpty() )
     return data.asString().c_str();
+
+  return wxEmptyString;
 }
 //--------------------------------------------------------------------------------
 
