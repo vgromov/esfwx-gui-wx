@@ -39,7 +39,7 @@ public:
   /// Return true if there is no data records
   bool isEmpty() const ES_NOTHROW { return m_data.empty(); }
 
-  /// Append field metadata, and return reference to the modle object, to 
+  /// Append field metadata, and return reference to the model object, to 
   /// augment chained fieldAdd calls
   ///
   EsListViewModel& fieldAdd(const wxString& name, ulong minWidthHint = 0, const wxString& hint = wxEmptyString);
