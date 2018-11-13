@@ -10,18 +10,18 @@
 // escore export-import defines
 #ifdef ES_DYNAMIC_LINKAGE
 #	ifdef ESCOREGUI_EXPORTS
-#		define ESCORE_GUI_CLASS	      ES_EXPORT_SPEC
-#		define ESCORE_GUI_FUNC(type)	ES_FUNCEXPORT_SPEC(type)
-#		define ESCORE_GUI_DATA(type)	ES_DATAEXPORT_SPEC(type)
+#		define ESCORE_GUI_CLASS	            ES_EXPORT_SPEC
+#		define ESCORE_GUI_FUNC(type, decl)	ES_FUNCEXPORT_SPEC(type, decl)
+#		define ESCORE_GUI_DATA(type, decl)	ES_DATAEXPORT_SPEC(type, decl)
 #	else
-#		define ESCORE_GUI_CLASS	      ES_IMPORT_SPEC
-#		define ESCORE_GUI_FUNC(type)	ES_FUNCIMPORT_SPEC(type)
-#		define ESCORE_GUI_DATA(type)	ES_DATAIMPORT_SPEC(type)
+#		define ESCORE_GUI_CLASS	            ES_IMPORT_SPEC
+#		define ESCORE_GUI_FUNC(type, decl)	ES_FUNCIMPORT_SPEC(type, decl)
+#		define ESCORE_GUI_DATA(type, decl)	ES_DATAIMPORT_SPEC(type, decl)
 #	endif
 #else
 #	define ESCORE_GUI_CLASS
-#	define ESCORE_GUI_FUNC(type)    type
-#	define ESCORE_GUI_DATA(type)    type
+#	define ESCORE_GUI_FUNC(type, decl)    type decl
+#	define ESCORE_GUI_DATA(type, decl)    type decl
 #endif
 
 // WX Non-GUI and GUI stuff

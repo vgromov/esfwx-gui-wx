@@ -1,5 +1,5 @@
 # top-level cmakefile for ekosfera frameworkGui
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.11)
 project(escore-gui)
 
 # wxWidgets dependencies
