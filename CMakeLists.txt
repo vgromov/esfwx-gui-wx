@@ -49,7 +49,7 @@ configure_file (
 	# for each subproject, add project current source and build dirs to the include directories
 	set(CMAKE_INCLUDE_CURRENT_DIR ON)
 	# reset i18n aggregation variables
-	I18N_RESET() 
+	ESI18N_RESET() 
 	# localization integration variables
 	set(i18nLanguages "" CACHE INTERNAL "" FORCE)
 	set(i18nComponents "" CACHE INTERNAL "" FORCE)

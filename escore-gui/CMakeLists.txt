@@ -76,7 +76,7 @@ set(escoregui_locale_SRCS
 #  locale/escore-gui.de_DE.po
 )
 source_group(locale FILES ${escoregui_locale_SRCS})
-I18N_ADD("escore-gui" escoregui_locale_SRCS "${binaryRoot}")
+ESI18N_ADD("escore-gui" escoregui_locale_SRCS "${binaryRoot}")
                         
 set(escoregui_SRCS         
   ${escoregui_common_SRCS}
@@ -103,8 +103,8 @@ endif()
 set(targetName "escoreguiLib${staticMarker}")
 set(${targetName} escoregui_${binarySuffix}${compilerVersion}${staticMarker} CACHE STRING "" FORCE)
 
-SPECIFY_PRECOMPILED_HEADER("escore_gui_pch.h" "escore_gui.cpp" escore_SRCS)
-SPECIFY_HEADER_FILES(escoregui_SRCS headerExtensions)
+ES_SPECIFY_PRECOMPILED_HEADER("escore_gui_pch.h" "escore_gui.cpp" escore_SRCS)
+ES_SPECIFY_HEADER_FILES(escoregui_SRCS headerExtensions)
 
 add_library(${${targetName}} 
   ${escoregui_SRCS} 
