@@ -338,7 +338,10 @@ wxPanel(
   0
 ),
 m_handler(*this),
-m_items(esT("EsProgressMonitorView")),
+m_items(
+  EsStringIndexedMap::ContainerUsesInterlock, 
+  esT("EsProgressMonitorView")
+),
 m_contents(nullptr)
 {
   m_contents = new wxBoxSizer(wxVERTICAL);
