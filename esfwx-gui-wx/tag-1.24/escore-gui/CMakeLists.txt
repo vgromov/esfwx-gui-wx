@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.11)
 project(escore-gui)
 
 # wxWidgets dependencies
-set(wxWidgets_USE_LIBS base)
+set(wxWidgets_USE_LIBS base core aui)
 find_package(wxWidgets 3.1.1 REQUIRED)
 include(${wxWidgets_USE_FILE})
 
@@ -12,35 +12,38 @@ link_directories(
   ${wxWidgets_LIB_DIR}
 )
 
-# component version definitions
-set(component_DESCRIPTION_STRING "ESFWX Core GUI Library for WX backend")
-set(component_INTERNAL_NAME "escore-gui")
-set(component_ORIGINAL_NAME "escore-gui.dll")
-set(component_BUILD_NUM 1)
+include(escoregui.defs.cmake)
+
+# escore configuration header generation
+#
+configure_file (
+  "${PROJECT_SOURCE_DIR}/EsCoreGuiConfig.h.in"
+  "${ES_PROJECT_ROOT}/EsCoreGuiConfig.h"
+)
 
 # component version file generation
 #
 configure_file (
   "${PROJECT_SOURCE_DIR}/build.h.in"
   "${PROJECT_SOURCE_DIR}/build.h"
-  )
+)
     
 # optional resource version file generation
 #
-configure_file (
+configure_file(
   "${PROJECT_SOURCE_DIR}/res/version.rc.in"
   "${PROJECT_SOURCE_DIR}/res/version.rc"
-  )
+)
 
 # documentation generator file  
 #
 configure_file (
   "${PROJECT_SOURCE_DIR}/Doxyfile.in"
   "${PROJECT_SOURCE_DIR}/Doxyfile"
-  )
+)
   
 set(escoregui_common_SRCS
-  ${escoregui_CONFIG_DIR}/EsCoreGuiConfig.h
+  ${ES_PROJECT_ROOT}/EsCoreGuiConfig.h
   build.h
   escore-gui.h
 #  EsCoreGui.cpp
@@ -97,16 +100,17 @@ link_directories(
 
 # targets
 set(staticMarker "")
-if( NOT BUILD_SHARED_LIBS )
+if( NOT ES_BUILD_SHARED_LIBS )
     set(staticMarker "_s")
 endif()
 set(targetName "escoreguiLib${staticMarker}")
-set(${targetName} escoregui_${binarySuffix}${compilerVersion}${staticMarker} CACHE STRING "" FORCE)
+set(${targetName} escoregui_${ESGUI_CORE_VERSION_SUFFIX}_${ESCOMMON_BIN_SUFFIX}${ESCOMMON_COMPILER_VERSION}${staticMarker} CACHE STRING "" FORCE)
 
 ES_SPECIFY_PRECOMPILED_HEADER("escore_gui_pch.h" "escore_gui.cpp" escore_SRCS)
 ES_SPECIFY_HEADER_FILES(escoregui_SRCS headerExtensions)
 
-add_library(${${targetName}} 
+add_library(
+  ${${targetName}} 
   ${escoregui_SRCS} 
   ${escoregui_RES}
 )
@@ -118,9 +122,15 @@ target_link_libraries( ${${targetName}}
 # customize target properties
 #
 # export preprocessor defines for dll
-if( BUILD_SHARED_LIBS )
-  set_target_properties(${${targetName}} PROPERTIES 
-    COMPILE_DEFINITIONS "${dynamicLinkPreprocessorDefines}"
-    DEFINE_SYMBOL ESCOREGUI_EXPORTS
+if( ES_BUILD_SHARED_LIBS )
+  if(BORLAND AND EMBARCADERO)
+    set_embt_target(Package)
+  endif()
+
+  set_property(
+    TARGET ${${targetName}}
+    APPEND
+    PROPERTY COMPILE_DEFINITIONS "${ES_USEDLL_PREPROC_FOR_DYNLIB}" ESCOREGUI_EXPORTS
   )
 endif()
+
