@@ -55,7 +55,7 @@ void EsUtilities::esStringArrayToMru(wxFileHistory& dest, const EsString::Array&
 {
   while(dest.GetCount())
     dest.RemoveFileFromHistory(0);
-  
+
   for( size_t idx = 0; idx < src.size(); ++idx )
     dest.AddFileToHistory(
       src[idx].c_str()
@@ -134,8 +134,8 @@ void EsUtilities::windowPosLoad(const EsStreamIntf::Ptr& in, wxWindow* wnd, cons
   // form pos & size
   wxPoint pos = wnd->GetPosition();
   windowPosLoad(
-    in, 
-    pos, 
+    in,
+    pos,
     wxPoint(0, 0)
   );
 
@@ -266,18 +266,23 @@ const wxBitmap& EsUtilities::stdBitmapGet(EsStdBitmapId id)
 
 wxMenuItem* EsUtilities::menuItemCreate(wxMenu* parent, int id, const wxString& label,
   const wxString& help, wxItemKind kind, const wxBitmap& normalChecked,
-  const wxBitmap& unchecked, wxMenu* submenu /*= 0*/)
+  const wxBitmap& unchecked, wxMenu* submenu /*= nullptr*/)
 {
   wxMenuItem* result = new wxMenuItem(parent, id, label, help, kind, submenu);
   ES_ASSERT(result);
 
+#if ES_OS == ES_OS_WINDOWS
   result->SetBitmaps(normalChecked, unchecked);
+#else
+  result->SetBitmap(normalChecked);
+#endif // ES_OS
+
   return result;
 }
 //--------------------------------------------------------------------------------
 
 wxMenuItem* EsUtilities::menuNormalItemCreate(wxMenu* parent, int id, const wxString& label,
-  const wxString& help, const wxBitmap& normal/* = wxNullBitmap*/, wxMenu* submenu /*= 0*/)
+  const wxString& help, const wxBitmap& normal/* = wxNullBitmap*/, wxMenu* submenu /*= nullptr*/)
 {
   return EsUtilities::menuItemCreate(parent, id, label, help, wxITEM_NORMAL, normal, normal, submenu);
 }
@@ -287,17 +292,17 @@ wxMenuItem* EsUtilities::menuCheckItemCreate(wxMenu* parent, int id, const wxStr
   const wxString& help, const wxBitmap& checked/* = wxNullBitmap*/, const wxBitmap& unchecked/* = wxNullBitmap*/)
 {
   return EsUtilities::menuItemCreate(
-    parent, 
-    id, 
-    label, 
-    help, 
+    parent,
+    id,
+    label,
+    help,
     wxITEM_CHECK,
-    checked.IsNull() ? 
-      stdBitmapGet(EsStdBitmapId::CheckChecked) : 
+    checked.IsNull() ?
+      stdBitmapGet(EsStdBitmapId::CheckChecked) :
       checked,
-    unchecked.IsNull() ? 
-      stdBitmapGet(EsStdBitmapId::CheckUnchecked) : 
-      unchecked, 
+    unchecked.IsNull() ?
+      stdBitmapGet(EsStdBitmapId::CheckUnchecked) :
+      unchecked,
     nullptr
   );
 }
@@ -307,17 +312,17 @@ wxMenuItem* EsUtilities::menuRadioItemCreate(wxMenu* parent, int id, const wxStr
   const wxString& help, const wxBitmap& checked/* = wxNullBitmap*/, const wxBitmap& unchecked/* = wxNullBitmap*/)
 {
   return EsUtilities::menuItemCreate(
-    parent, 
-    id, 
-    label, 
-    help, 
+    parent,
+    id,
+    label,
+    help,
     wxITEM_CHECK/*wxITEM_RADIO*/,
-    checked.IsNull() ? 
-      stdBitmapGet(EsStdBitmapId::RadioChecked) : 
+    checked.IsNull() ?
+      stdBitmapGet(EsStdBitmapId::RadioChecked) :
       checked,
-    unchecked.IsNull() ? 
-      stdBitmapGet(EsStdBitmapId::RadioUnchecked) : 
-      unchecked, 
+    unchecked.IsNull() ?
+      stdBitmapGet(EsStdBitmapId::RadioUnchecked) :
+      unchecked,
     nullptr
   );
 }
@@ -338,9 +343,9 @@ wxMenu* EsUtilities::menuLanguageSelectionCreate(const EsString::Array& langs, i
 
     result->AppendCheckItem(
       startId + idx,
-      nativeLang.c_str(), 
+      nativeLang.c_str(),
       wxString::Format(
-        _("Select '%s' user interface language"), 
+        _("Select '%s' user interface language"),
         nativeLang.c_str()
       )
     );
@@ -368,6 +373,7 @@ void EsUtilities::menuItemBitmapSet(wxMenu* mnu, int id, const wxSize& bmSize, c
   if( img.IsOk() )
     item->SetBitmap(img);
 
+#if ES_OS == ES_OS_WINDOWS
   wxBitmap imgDisabled;
   if( !bmDisabled.IsEmpty() )
     imgDisabled = wxArtProvider::GetBitmap(
@@ -377,6 +383,7 @@ void EsUtilities::menuItemBitmapSet(wxMenu* mnu, int id, const wxSize& bmSize, c
     );
   if( imgDisabled.IsOk() )
     item->SetDisabledBitmap(imgDisabled);
+#endif // ES_OS
 }
 //--------------------------------------------------------------------------------
 
@@ -424,6 +431,7 @@ void EsUtilities::menuClone(wxMenu* dest, const wxMenu* src)
       dest->Append(newItem);
     }
 
+#if ES_OS == ES_OS_WINDOWS
     newItem->SetBitmaps(
       item->GetBitmap(),
       item->GetBitmap(false)
@@ -431,6 +439,11 @@ void EsUtilities::menuClone(wxMenu* dest, const wxMenu* src)
     newItem->SetDisabledBitmap(
       item->GetDisabledBitmap()
     );
+#else
+    newItem->SetBitmap(
+      item->GetBitmap()
+    );
+#endif
   }
 }
 //--------------------------------------------------------------------------------
@@ -475,6 +488,7 @@ wxWindow* EsUtilities::topLevelWindowGetFor(wxWindow* wnd)
 //
 static void menuFontSet(wxMenu* menu, const wxFont& fnt)
 {
+#if ES_OS == ES_OS_WINDOWS
   ES_ASSERT(menu);
   wxMenuItemList& items = menu->GetMenuItems();
   for(size_t idx = 0; idx < items.size(); ++idx)
@@ -490,6 +504,7 @@ static void menuFontSet(wxMenu* menu, const wxFont& fnt)
     if(item->IsSubMenu())
       menuFontSet(item->GetSubMenu(), fnt);
   }
+#endif
 }
 //--------------------------------------------------------------------------------
 
@@ -799,12 +814,14 @@ wxAuiToolBarItem* EsUtilities::toolbarToolAddFromMenuItem(wxAuiToolBar* tb, wxMe
   wxBitmap img;
   if( !bm.IsEmpty() )
     img = wxArtProvider::GetBitmap(
-      bm, 
-      cli, 
+      bm,
+      cli,
       tb->GetToolBitmapSize()
     );
+#if ES_OS == ES_OS_WINDOWS
   if( !img.IsOk() )
     img = item->GetBitmap(false);
+#endif
 
   wxBitmap imgDisabled;
   if( !bmDisabled.IsEmpty() )
@@ -813,11 +830,13 @@ wxAuiToolBarItem* EsUtilities::toolbarToolAddFromMenuItem(wxAuiToolBar* tb, wxMe
       cli,
       tb->GetToolBitmapSize()
     );
+#if ES_OS == ES_OS_WINDOWS
   if( !imgDisabled.IsOk() )
     imgDisabled = item->GetDisabledBitmap();
+#endif
 
   return tb->AddTool(
-    id, 
+    id,
     item->GetItemLabelText(),
     img,
     imgDisabled,
@@ -871,8 +890,10 @@ wxToolBarToolBase* EsUtilities::toolbarToolAddFromMenuItem(wxToolBar* tb, wxMenu
       cli,
       tb->GetToolBitmapSize()
     );
+#if ES_OS == ES_OS_WINDOWS
   if(!img.IsOk())
     img = item->GetBitmap(false);
+#endif // ES_OS
 
   wxBitmap imgDisabled;
   if(!bmDisabled.IsEmpty())
@@ -881,8 +902,10 @@ wxToolBarToolBase* EsUtilities::toolbarToolAddFromMenuItem(wxToolBar* tb, wxMenu
       cli,
       tb->GetToolBitmapSize()
     );
+#if ES_OS == ES_OS_WINDOWS
   if(!imgDisabled.IsOk())
     imgDisabled = item->GetDisabledBitmap();
+#endif // ES_OS
 
   return tb->AddTool(
     id,
