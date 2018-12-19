@@ -104,7 +104,7 @@ if( NOT ES_BUILD_SHARED_LIBS )
     set(staticMarker "_s")
 endif()
 set(targetName "escoreguiLib${staticMarker}")
-set(${targetName} escoregui_${ESGUI_CORE_VERSION_SUFFIX}_${ESCOMMON_BIN_SUFFIX}${ESCOMMON_COMPILER_VERSION}${staticMarker} CACHE STRING "" FORCE)
+set(${targetName} escoregui_${ESGUI_CORE_VERSION_SUFFIX}_${ESCOMMON_BIN_SUFFIX}${ESCOMMON_COMPILER_VERSION}${staticMarker} CACHE INTERNAL "" FORCE)
 
 ES_SPECIFY_PRECOMPILED_HEADER("escore_gui_pch.h" "escore_gui.cpp" escore_SRCS)
 ES_SPECIFY_HEADER_FILES(escoregui_SRCS headerExtensions)
