@@ -265,16 +265,28 @@ const wxBitmap& EsUtilities::stdBitmapGet(EsStdBitmapId id)
 //--------------------------------------------------------------------------------
 
 wxMenuItem* EsUtilities::menuItemCreate(wxMenu* parent, int id, const wxString& label,
-  const wxString& help, wxItemKind kind, const wxBitmap& normalChecked,
+  const wxString& help, wxItemKind kind, const wxBitmap& normalOrChecked,
   const wxBitmap& unchecked, wxMenu* submenu /*= nullptr*/)
 {
-  wxMenuItem* result = new wxMenuItem(parent, id, label, help, kind, submenu);
+  wxMenuItem* result = new wxMenuItem(
+    parent,
+    id,
+    label,
+    help,
+    kind,
+    submenu
+  );
   ES_ASSERT(result);
 
 #if ES_OS == ES_OS_WINDOWS
-  result->SetBitmaps(normalChecked, unchecked);
+  if(wxItemKind::wxITEM_SEPARATOR != kind)
+    result->SetBitmaps(
+      normalOrChecked,
+      unchecked
+    );
 #else
-  result->SetBitmap(normalChecked);
+  if(wxItemKind::wxITEM_NORMAL == kind)
+    result->SetBitmap(normalOrChecked);
 #endif // ES_OS
 
   return result;
@@ -284,7 +296,16 @@ wxMenuItem* EsUtilities::menuItemCreate(wxMenu* parent, int id, const wxString& 
 wxMenuItem* EsUtilities::menuNormalItemCreate(wxMenu* parent, int id, const wxString& label,
   const wxString& help, const wxBitmap& normal/* = wxNullBitmap*/, wxMenu* submenu /*= nullptr*/)
 {
-  return EsUtilities::menuItemCreate(parent, id, label, help, wxITEM_NORMAL, normal, normal, submenu);
+  return EsUtilities::menuItemCreate(
+    parent,
+    id,
+    label,
+    help,
+    wxITEM_NORMAL,
+    normal,
+    normal,
+    submenu
+  );
 }
 //--------------------------------------------------------------------------------
 
