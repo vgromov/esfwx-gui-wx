@@ -5,7 +5,7 @@ set(component_ORIGINAL_NAME "escore-gui")
 set(component_BUILD_NUM 2)
 
 # Set-up ESCORE binary version naming
-set(ESGUI_CORE_VERSION_SUFFIX "${ESGUI_VERSION_SUFFIX}_${component_BUILD_NUM}")
+set(ESGUI_CORE_VERSION_SUFFIX "${ESGUI_VERSION_SUFFIX}_${component_BUILD_NUM}" CACHE INTERNAL "")
 
 if(WIN32)
 set(ESGUICONFIG_USE_AUTO_UPDATER 1 CACHE BOOL "Use Sparkle Online AutoUpdater wrapper class")
