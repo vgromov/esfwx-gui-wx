@@ -5,6 +5,8 @@ project(escore-gui)
 # wxWidgets dependencies
 set(wxWidgets_USE_LIBS base core aui)
 find_package(wxWidgets 3.1.1 REQUIRED)
+set(ES_WXWIDGETS_VER_STRING ${wxWidgets_VERSION_STRING} CACHE INTERNAL "" FORCE)
+
 include(${wxWidgets_USE_FILE})
 
 # set-up link directories for wxWidgets
