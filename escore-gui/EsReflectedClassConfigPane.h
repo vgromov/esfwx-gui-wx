@@ -24,27 +24,40 @@ __published:	// IDE-managed Components
   TGridPanelLayout *layContents_;
 
 public:		// User declarations
-	__fastcall EsReflectedClassConfigPane(TComponent* Owner, const EsString& className,
+  EsReflectedClassConfigPane(TComponent* Owner, const EsString& className,
 								const EsMetaclassIntf::Ptr& meta = EsMetaclassIntf::Ptr());
 
-  virtual __fastcall ~EsReflectedClassConfigPane();
+  virtual ~EsReflectedClassConfigPane();
 
-	EsString supportedTypeNameGet() const;
-	virtual void applyFromObject(const EsReflectedClassIntf::Ptr& obj);
-	virtual void applyToObject(const EsReflectedClassIntf::Ptr& obj);
+  EsString supportedTypeNameGet() const;
+  void applyFromObject(const EsReflectedClassIntf::Ptr& obj);
+  void applyToObject(const EsReflectedClassIntf::Ptr& obj);
 
   EsReflectedClassDataSource& sourceGet();
 
-	// Return total height of frame contents
-	virtual float totalHeightGet() const = 0;
+  // Return total height of frame contents
+  virtual float totalHeightGet() const = 0;
 
   void i18nMgrSet(PlainEsI18nManagerPtrT mgr);
+
+  // True, while setting control properties from the reflected object.
+  // False otherwise
+  //
+  __property bool applyingFromObject = {read=m_applyingFromObject};
 
 protected:
   void sizeChangedPost(double x, double y);
 
+  void onGuiStringsUpdate(TObject* sender);
+
+  virtual void doApplyFromObject(const EsReflectedClassIntf::Ptr& obj);
+  virtual void doApplyToObject(const EsReflectedClassIntf::Ptr& obj);
+  virtual void i18nStringsUpdate(const EsString& loc);
+
 protected:
-	EsReflectedClassDataSource* m_src;
+  EsI18nManagerScope m_i18nScope;
+  EsReflectedClassDataSource* m_src;
+  bool m_applyingFromObject;
 
 private:
   EsReflectedClassConfigPane(const EsReflectedClassConfigPane&) ES_REMOVEDECL;
