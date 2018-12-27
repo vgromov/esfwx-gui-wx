@@ -22,7 +22,7 @@ configure_file (
 
 # wxWidgets dependencies
 set(wxWidgets_USE_LIBS base core)
-find_package(wxWidgets 2.9 REQUIRED)
+find_package(wxWidgets 3.0 REQUIRED)
 include(${wxWidgets_USE_FILE})
 
 # project top-level build directory
