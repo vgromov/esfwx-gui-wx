@@ -48,16 +48,16 @@ set(escoregui_common_SRCS
   ${ES_PROJECT_ROOT}/EsCoreGuiConfig.h
   build.h
   escore-gui.h
-#  EsCoreGui.cpp
-#  EsCoreGui.h
+  EsReflectionGuiLinks.cpp
+  EsReflectionGuiLinks.h
   EsListViewBase.cpp
   EsListViewBase.h
   EsAppLog.cpp
   EsAppLog.h
   EsProgressMonitorView.cpp
   EsProgressMonitorView.h
-#  EsReflectedClassConfigPane.cpp
-#  EsReflectedClassConfigPane.h
+  EsReflectedClassConfigPane.cpp
+  EsReflectedClassConfigPane.h
 )
 source_group(common FILES ${escoregui_common_SRCS})
 
