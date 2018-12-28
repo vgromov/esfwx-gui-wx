@@ -2,8 +2,6 @@
 #define EsReflectedClassConfigPaneH
 //---------------------------------------------------------------------------
 
-#include <wx/panel.h>
-
 /// Configuration pane events category
 ///
 #define ES_EVTC_CLASSCFG_PANE_NOTIFICATION esT("EsReflectedClassConfigPane")
@@ -11,7 +9,7 @@
 enum class EsReflectedClassConfigPaneEvent : ulong
 {
   SizeChanged = 1,  ///< payload[0] contains pointer to pane instance, which size was changed,
-                    ///  payload[1] = x (double), payload[2] = y (double)
+                    ///  payload[1] = x (int), payload[2] = y (int)
   PaneCreated = 2,  ///< payload[0] contains pointer to event source instance (sender),
                     ///  payload[1] = pinter to created pane instance
 };
@@ -20,14 +18,8 @@ enum class EsReflectedClassConfigPaneEvent : ulong
 ///
 class ESCORE_GUI_CLASS EsReflectedClassConfigPane : public wxPanel
 {
-__published:	// IDE-managed Components
-  TGridPanelLayout *layContents_;
-
 public:		// User declarations
-  EsReflectedClassConfigPane(TComponent* Owner, const EsString& className,
-								const EsMetaclassIntf::Ptr& meta = EsMetaclassIntf::Ptr());
-
-  virtual ~EsReflectedClassConfigPane();
+  EsReflectedClassConfigPane(wxWindow* parent, const EsString& className, const EsMetaclassIntf::Ptr& meta = nullptr);
 
   EsString supportedTypeNameGet() const;
   void applyFromObject(const EsReflectedClassIntf::Ptr& obj);
@@ -36,27 +28,23 @@ public:		// User declarations
   EsReflectedClassDataSource& sourceGet();
 
   // Return total height of frame contents
-  virtual float totalHeightGet() const = 0;
-
-  void i18nMgrSet(PlainEsI18nManagerPtrT mgr);
+  virtual int totalHeightGet() const = 0;
 
   // True, while setting control properties from the reflected object.
   // False otherwise
   //
-  __property bool applyingFromObject = {read=m_applyingFromObject};
+  inline bool isApplyingFromObject() const ES_NOTHROW { return m_applyingFromObject; }
 
 protected:
-  void sizeChangedPost(double x, double y);
-
-  void onGuiStringsUpdate(TObject* sender);
+  void sizeChangedPost(int x, int y);
 
   virtual void doApplyFromObject(const EsReflectedClassIntf::Ptr& obj);
   virtual void doApplyToObject(const EsReflectedClassIntf::Ptr& obj);
   virtual void i18nStringsUpdate(const EsString& loc);
 
 protected:
-  EsI18nManagerScope m_i18nScope;
-  EsReflectedClassDataSource* m_src;
+  wxGridBagSizer m_layContents;
+  EsReflectedClassDataSource m_src;
   bool m_applyingFromObject;
 
 private:

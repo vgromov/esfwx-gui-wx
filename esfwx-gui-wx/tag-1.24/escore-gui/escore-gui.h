@@ -41,6 +41,12 @@
 #include <wx/listctrl.h>
 #include <wx/aui/aui.h>
 #include <wx/sysopt.h>
+#include <wx/gbsizer.h>
+#include <wx/panel.h>
+#include <wx/stattext.h>
+#include <wx/combobox.h>
+#include <wx/spinctrl.h>
+#include <wx/checkbox.h>
 
 /// The following minimum system options must be defined for toolbar and menu images to be sized properly:
 ///"app.mnu.imgwh"
@@ -71,7 +77,7 @@ enum {
 #endif
 #include <escore-gui/EsDlgBase.h>
 #include <escore-gui/EsCoreGuiUtilities.h>
-//#include <escore-gui/EsCoreGui.h>
+#include <escore-gui/EsReflectionGuiLinks.h>
 #include <escore-gui/EsListViewBase.h>
 #include <escore-gui/EsAppLog.h>
 #include <escore-gui/EsProgressMonitorView.h>
