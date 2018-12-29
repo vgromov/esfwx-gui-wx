@@ -1,52 +1,10 @@
 #ifndef _ekonnect_io_channel_config_pane_h_
 #define _ekonnect_io_channel_config_pane_h_
 
-class EsChannelIoEkonnectConfigPaneWnd : public wxPanel
+class ESCOMM_GUI_CLASS EsChannelIoEkonnectConfigPane : EsReflectedClassConfigPane
 {
 public:
-	// configuration pane interface implementor
-	struct EsChannelIoEkonnectConfigPane :	public EsBaseIntf,
-																				public EsReflectedObjectConfigPaneIntf,
-																				public EsReflectedClassIntf
-	{
-		EsChannelIoEkonnectConfigPane( EsChannelIoEkonnectConfigPaneWnd& This ) : m_this(This) {}
-		
-		// reflection support
-		ES_DECL_REFLECTED_CLASS_BASE( EsChannelIoEkonnectConfigPane )
-		ES_DECL_ATTR_HANDLING_STD
-		
-		ES_INTF_MAP_BEGIN( EsChannelIoEkonnectConfigPane )
-			ES_INTF_SUPPORTS( EsChannelIoEkonnectConfigPane, EsReflectedObjectConfigPaneIntf )
-			ES_INTF_SUPPORTS( EsChannelIoEkonnectConfigPane, EsReflectedClassIntf )
-		ES_INTF_MAP_END
-		{
-			// destroy implementation
-			m_this.Hide();
-			m_this.Destroy();
-		}
-		
-		// reflected ctor
-		ES_DECL_REFLECTED_CLASS_CTOR1(EsBaseIntfPtr, p_wxObject) 
-		{ 
-			EsChannelIoEkonnectConfigPaneWnd* pane = new EsChannelIoEkonnectConfigPaneWnd( dynamic_cast<wxWindow*>(p1) ); 
-			wxASSERT(pane); 
-			return EsBaseIntf::Ptr(&pane->m_intf); 
-		}
-
-		// EsReflectedObjectConfigPaneIntf implementation
-		ES_DECL_INTF_METHOD(EsString, getObjectName)() const;
-		ES_DECL_INTF_METHOD(wxWindow*, getWindow)() { return &m_this; }
-		ES_DECL_INTF_METHOD(void, updateControls)( const EsReflectedClassIntf::Ptr& chnl ) { m_this.m_links.updateControls(chnl); }
-		ES_DECL_INTF_METHOD(void, updateObject)( const EsReflectedClassIntf::Ptr& chnl ) const { m_this.m_links.updateObject(chnl); }
-		
-		// data members
-		EsChannelIoEkonnectConfigPaneWnd& m_this;
-	};
-	friend struct EsChannelIoEkonnectConfigPane;
-
-protected:
-	// create pane window via reflected constructor "NEW" only
-	EsChannelIoEkonnectConfigPaneWnd(wxWindow* parent);
+	EsChannelIoEkonnectConfigPane(wxWindow* parent);
 
 protected:
 	// selectors population helpers
@@ -54,7 +12,8 @@ protected:
 
 	// reset button click handler
 	void onResetToDefaults(wxCommandEvent& evt);
-	// rescan button handler
+
+  // rescan button handler
 	void onRescan(wxCommandEvent& evt);	
 
 protected:
@@ -83,12 +42,6 @@ protected:
 	wxSpinCtrl* m_edTxBuff;
 	wxCheckBox* m_chkResetOnRxTmo;
 	wxCheckBox* m_chkUseRS232;
-		
-	// interface implementor instance
-	EsChannelIoEkonnectConfigPane m_intf;
-	// channel property links collection
-	EsFtdiDriver::DeviceList m_devices;
-	EsPropertyLinks m_links;
 };
 
 #endif // _ekonnect_io_channel_config_pane_h_

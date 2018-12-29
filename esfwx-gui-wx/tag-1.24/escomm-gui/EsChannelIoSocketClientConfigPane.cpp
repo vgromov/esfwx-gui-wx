@@ -1,26 +1,13 @@
-#include "stdafx.h"
+#include "escomm_gui_pch.h"
 #pragma hdrstop
 
 #include "EsChannelIoSocketClientConfigPane.h"
 
-// configuration pane interface implementor proxy
-//
-ES_DECL_NESTED_BASE_CLASS_INFO_BEGIN(EsChannelIoSocketClientConfigPaneWnd::EsChannelIoSocketClientConfigPane, EsChannelIoSocketClientConfigPane, _i("Client socket channel configuration GUI."))
-	// class services
-	ES_DECL_REFLECTED_CTOR_INFO(EsChannelIoSocketClientConfigPaneWnd::EsChannelIoSocketClientConfigPane, EsBaseIntfPtr_ClassCall_p_wxObject, _i("EsChannelIoSocketClientConfigPane constructor."))
-ES_DECL_CLASS_INFO_END
-
-EsChannelIoSocketClientConfigPaneWnd::EsChannelIoSocketClientConfigPane::~EsChannelIoSocketClientConfigPane() {}
-
-EsString EsChannelIoSocketClientConfigPaneWnd::EsChannelIoSocketClientConfigPane::getObjectName() const 
-{ 
-	return EsChannelIoSocketClient::getClassInfoStatic().nameGet(); 
-}
-
-// configuration pane itself
-//
-EsChannelIoSocketClientConfigPaneWnd::EsChannelIoSocketClientConfigPaneWnd(wxWindow* parent) :
-wxPanel(parent),
+EsChannelIoSocketClientConfigPane::EsChannelIoSocketClientConfigPane(wxWindow* parent) :
+EsReflectedClassConfigPane(
+  parent, 
+  EsChannelIoSocketClient::classNameGetStatic() 
+),
 m_intf(*this),
 m_reset(new wxButton(this, wxID_ANY, _("Reset to defaults"))),
 m_edAddr(new wxTextCtrl(this, wxID_ANY)),
@@ -57,16 +44,16 @@ m_lblTmo(new wxStaticText(this, wxID_ANY, wxEmptyString))
 		.linkAdd(EsSpinCtlPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoSocketClient, targetPort), m_edPort, m_lblPort))
 		.linkAdd(EsSpinCtlPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoSocketClient, operationTimeout), m_edTmo, m_lblTmo));
 
-	m_reset->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoSocketClientConfigPaneWnd::onResetToDefaults, this);
+	m_reset->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoSocketClientConfigPane::onResetToDefaults, this);
 }
 
-EsChannelIoSocketClientConfigPaneWnd::~EsChannelIoSocketClientConfigPaneWnd()
+EsChannelIoSocketClientConfigPane::~EsChannelIoSocketClientConfigPane()
 {
-	m_reset->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoSocketClientConfigPaneWnd::onResetToDefaults, this);
+	m_reset->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoSocketClientConfigPane::onResetToDefaults, this);
 }
 
 // reset button click handler
-void EsChannelIoSocketClientConfigPaneWnd::onResetToDefaults(wxCommandEvent& evt)
+void EsChannelIoSocketClientConfigPane::onResetToDefaults(wxCommandEvent& evt)
 {
 	m_links.resetControlsToDefault();
 }

@@ -26,6 +26,9 @@ typedef std::function<void (EsReflectedClassPropertyLink& sender, const EsVarian
 
 class ESCORE_GUI_CLASS EsReflectedClassPropertyLink
 {
+public:
+  typedef std::shared_ptr<EsReflectedClassPropertyLink> PtrT;
+
 protected:
   EsReflectedClassPropertyLink(wxControl* ref, const EsString& propName);
 
@@ -87,7 +90,7 @@ private:
 
 /// Property links collection for group access to reflected class properties
 ///
-typedef std::set< EsReflectedClassPropertyLink* > EsReflectedClassPropertyLinksT;
+typedef std::set< EsReflectedClassPropertyLink::PtrT > EsReflectedClassPropertyLinksT;
 
 class ESCORE_GUI_CLASS EsReflectedClassDataSource
 {
@@ -102,7 +105,7 @@ public:
 
   inline bool isReadOnly() const ES_NOTHROW { return m_readOnly; }
   
-  void link(EsReflectedClassPropertyLink* link);
+  void link(const EsReflectedClassPropertyLink::PtrT& link);
 
   void controlsUpdateFromObject(const EsReflectedClassIntf::Ptr& obj);
   void objectUpdateFromControls(const EsReflectedClassIntf::Ptr& obj) const;
@@ -111,8 +114,8 @@ public:
   virtual void i18nStringsUpdate(const EsString& loc);
 
 protected:
-  void linkAdd(EsReflectedClassPropertyLink* link);
-  void linkRemove(EsReflectedClassPropertyLink* link);
+  void linkAdd(const EsReflectedClassPropertyLink::PtrT& link);
+  void linkRemove(const EsReflectedClassPropertyLink::PtrT& link);
   void classNameCheck(const EsReflectedClassIntf::Ptr& obj) const;
 
 protected:
@@ -178,8 +181,11 @@ private:
 ///
 class ESCORE_GUI_CLASS EsComboBoxPropertyLink : public EsReflectedClassPropertyLink
 {
+protected:
+  EsComboBoxPropertyLink(const EsString& prop, wxComboBox* cbx, wxStaticText* lbl, bool useLookup);
+
 public:
-  EsComboBoxPropertyLink(const EsString& prop, wxComboBox* cbx, wxStaticText* lbl = nullptr, bool useLookup = false);
+  static EsReflectedClassPropertyLink::PtrT create(const EsString& prop, wxComboBox* cbx, wxStaticText* lbl = nullptr, bool useLookup = false);
 
   virtual bool isUnidirectional() const ES_OVERRIDE;
 
@@ -200,8 +206,11 @@ protected:
 ///
 class ESCORE_GUI_CLASS EsSpinCtlPropertyLink : public EsReflectedClassPropertyLink
 {
+protected:
+  EsSpinCtlPropertyLink(const EsString& propName, wxSpinCtrl* ctl, wxStaticText* lbl);
+
 public:
-  EsSpinCtlPropertyLink(const EsString& propName, wxSpinCtrl* ctl, wxStaticText* lbl = nullptr);
+  static EsReflectedClassPropertyLink::PtrT create(const EsString& propName, wxSpinCtrl* ctl, wxStaticText* lbl = nullptr);
 
   virtual bool isUnidirectional() const ES_OVERRIDE;
 
@@ -221,8 +230,11 @@ protected:
 ///
 class ESCORE_GUI_CLASS EsSpinCtlDoublePropertyLink : public EsReflectedClassPropertyLink
 {
+protected:
+  EsSpinCtlDoublePropertyLink(const EsString& propName, wxSpinCtrlDouble* ctl, wxStaticText* lbl);
+
 public:
-  EsSpinCtlDoublePropertyLink(const EsString& propName, wxSpinCtrlDouble* ctl, wxStaticText* lbl = nullptr);
+  static EsReflectedClassPropertyLink::PtrT create(const EsString& propName, wxSpinCtrlDouble* ctl, wxStaticText* lbl = nullptr);
 
   virtual bool isUnidirectional() const ES_OVERRIDE;
 
@@ -242,8 +254,11 @@ protected:
 ///
 class ESCORE_GUI_CLASS EsTextCtlPropertyLink : public EsReflectedClassPropertyLink
 {
+protected:
+  EsTextCtlPropertyLink(const EsString& propName, wxTextCtrl* ctl, wxStaticText* lbl);
+
 public:
-  EsTextCtlPropertyLink(const EsString& propName, wxTextCtrl* ctl, wxStaticText* lbl = nullptr);
+  static EsReflectedClassPropertyLink::PtrT create(const EsString& propName, wxTextCtrl* ctl, wxStaticText* lbl = nullptr);
 
   virtual bool isUnidirectional() const ES_OVERRIDE;
 
@@ -263,8 +278,11 @@ protected:
 ///
 class ESCORE_GUI_CLASS EsCheckBoxPropertyLink : public EsReflectedClassPropertyLink
 {
-public:
+protected:
   EsCheckBoxPropertyLink(const EsString& propName, wxCheckBox* cbx);
+
+public:
+  static EsReflectedClassPropertyLink::PtrT create(const EsString& propName, wxCheckBox* cbx);
 
   virtual bool isUnidirectional() const ES_OVERRIDE;
   

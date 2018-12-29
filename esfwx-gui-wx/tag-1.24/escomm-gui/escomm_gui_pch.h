@@ -4,10 +4,11 @@
 //
 
 // escore stuff
-#include <escore/ekosf-core.h>
-#include <escore-gui/ekosf-core-gui.h>
-#include <escomm/ekosf-comm.h>
+#include <escore/escore.h>
+#include <escomm/escomm.h>
+#include <escore-gui/escore-gui.h>
+
 // own include
-#include "ekosf-comm-gui.h"
+#include "escomm-gui.h"
 
 #endif // _std_afx_h_

@@ -287,21 +287,21 @@ void EsReflectedClassDataSource::i18nStringsUpdate(const EsString& loc)
 }
 //---------------------------------------------------------------------------
 
-void EsReflectedClassDataSource::link(EsReflectedClassPropertyLink* link)
+void EsReflectedClassDataSource::link(const EsReflectedClassPropertyLink::PtrT& link)
 {
   ES_ASSERT(link);
   link->sourceSet(this);
 }
 //---------------------------------------------------------------------------
 
-void EsReflectedClassDataSource::linkAdd(EsReflectedClassPropertyLink* link)
+void EsReflectedClassDataSource::linkAdd(const EsReflectedClassPropertyLink::PtrT& link)
 {
   ES_ASSERT(link);
   m_links.insert(link);
 }
 //---------------------------------------------------------------------------
 
-void EsReflectedClassDataSource::linkRemove(EsReflectedClassPropertyLink* link)
+void EsReflectedClassDataSource::linkRemove(const EsReflectedClassPropertyLink::PtrT& link)
 {
   ES_ASSERT(link);
   m_links.erase(link);
@@ -446,6 +446,21 @@ m_lbl(lbl),
 m_useLookup(useLookup)
 {
   ES_ASSERT(cbx);
+}
+//---------------------------------------------------------------------------
+
+EsReflectedClassPropertyLink::PtrT EsComboBoxPropertyLink::create(const EsString& prop, wxComboBox* cbx, wxStaticText* lbl /*= nullptr*/, bool useLookup /*= false*/)
+{
+  PtrT ptr = ES_MAKE_SHARED(
+    EsComboBoxPropertyLink,
+    prop,
+    cbx,
+    lbl,
+    useLookup
+  );
+  ES_ASSERT(ptr);
+
+  return ptr;
 }
 //---------------------------------------------------------------------------
 
@@ -645,6 +660,20 @@ m_lbl(lbl)
 }
 //---------------------------------------------------------------------------
 
+EsReflectedClassPropertyLink::PtrT EsSpinCtlPropertyLink::create(const EsString& propName, wxSpinCtrl* ctl, wxStaticText* lbl /*= nullptr*/)
+{
+  PtrT ptr = ES_MAKE_SHARED(
+    EsSpinCtlPropertyLink,
+    propName,
+    ctl,
+    lbl
+  );
+  ES_ASSERT(ptr);
+
+  return ptr;
+}
+//---------------------------------------------------------------------------
+
 bool EsSpinCtlPropertyLink::isUnidirectional() const
 {
   if(m_ctl)
@@ -752,6 +781,20 @@ m_ctl(ctl),
 m_lbl(lbl)
 {
   ES_ASSERT(m_ctl);
+}
+//---------------------------------------------------------------------------
+
+EsReflectedClassPropertyLink::PtrT EsSpinCtlDoublePropertyLink::create(const EsString& propName, wxSpinCtrlDouble* ctl, wxStaticText* lbl /*= nullptr*/)
+{
+  PtrT ptr = ES_MAKE_SHARED(
+    EsSpinCtlDoublePropertyLink,
+    propName,
+    ctl,
+    lbl
+  );
+  ES_ASSERT(ptr);
+
+  return ptr;
 }
 //---------------------------------------------------------------------------
 
@@ -873,6 +916,20 @@ m_lbl(lbl)
 }
 //---------------------------------------------------------------------------
 
+EsReflectedClassPropertyLink::PtrT EsTextCtlPropertyLink::create(const EsString& propName, wxTextCtrl* ctl, wxStaticText* lbl /*= nullptr*/)
+{
+  PtrT ptr = ES_MAKE_SHARED(
+    EsTextCtlPropertyLink,
+    propName,
+    ctl,
+    lbl
+  );
+  ES_ASSERT(ptr);
+
+  return ptr;
+}
+//---------------------------------------------------------------------------
+
 bool EsTextCtlPropertyLink::isUnidirectional() const
 {
   if(m_ctl)
@@ -951,6 +1008,19 @@ EsReflectedClassPropertyLink(
 m_ctl(cbx)
 {
   ES_ASSERT(m_ctl);
+}
+//---------------------------------------------------------------------------
+
+EsReflectedClassPropertyLink::PtrT EsCheckBoxPropertyLink::create(const EsString& propName, wxCheckBox* cbx)
+{
+  PtrT ptr = ES_MAKE_SHARED(
+    EsCheckBoxPropertyLink,
+    propName,
+    cbx
+  );
+  ES_ASSERT(ptr);
+
+  return ptr;
 }
 //---------------------------------------------------------------------------
 

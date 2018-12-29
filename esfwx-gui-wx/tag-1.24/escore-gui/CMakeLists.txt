@@ -1,5 +1,5 @@
 # top-level cmakefile for ekosfera frameworkGui
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.10)
 project(escore-gui)
 
 # wxWidgets dependencies
@@ -116,14 +116,15 @@ add_library(
   ${escoregui_SRCS} 
   ${escoregui_RES}
 )
-target_link_libraries( ${${targetName}} 
+target_link_libraries( 
+  ${${targetName}} 
 	${escoreLib${staticMarker}}
 	${wxWidgets_LIBRARIES} 
 )
 
-# customize target properties
+# Customize target properties
 #
-# export preprocessor defines for dll
+# Export preprocessor defines for dll
 if( ES_BUILD_SHARED_LIBS )
   if(BORLAND AND EMBARCADERO)
     set_embt_target(Package)

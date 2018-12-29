@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "escomm_gui_pch.h"
 #pragma hdrstop
 
 #include <wx/spinctrl.h>
