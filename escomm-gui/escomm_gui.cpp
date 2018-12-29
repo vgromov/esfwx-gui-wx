@@ -1,5 +1,5 @@
 // file used solely for precomiled symbols generation
-#include "stdafx.h"
+#include "escomm_gui_pch.h"
 #pragma hdrstop
 
 #if defined(_DEBUG) && (1 == USE_MEMLEAK_DETECTION)

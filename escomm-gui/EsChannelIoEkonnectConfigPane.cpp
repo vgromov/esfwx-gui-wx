@@ -1,4 +1,4 @@
-#include <stdafx.h>
+#include "escomm_gui_pch.h"
 #pragma hdrstop
 
 #include <wx/spinctrl.h>
@@ -88,32 +88,41 @@ protected:
 	wxStaticText* m_lbl;
 	const EsFtdiDriver::DeviceList& m_devices;
 };
+//--------------------------------------------------------------------------------
 
-// configuration pane interface implementor proxy
-//
-ES_DECL_NESTED_BASE_CLASS_INFO_BEGIN(EsChannelIoEkonnectConfigPaneWnd::EsChannelIoEkonnectConfigPane, EsChannelIoEkonnectConfigPane, _i("UART channel configuration GUI."))
-	// class services
-	ES_DECL_REFLECTED_CTOR_INFO(EsChannelIoEkonnectConfigPaneWnd::EsChannelIoEkonnectConfigPane, EsBaseIntfPtr_ClassCall_p_wxObject, _i("EsChannelIoEkonnectConfigPane constructor."))
-ES_DECL_CLASS_INFO_END
-
-EsChannelIoEkonnectConfigPaneWnd::EsChannelIoEkonnectConfigPane::~EsChannelIoEkonnectConfigPane() {}
-
-EsString EsChannelIoEkonnectConfigPaneWnd::EsChannelIoEkonnectConfigPane::getObjectName() const 
-{ 
-	return EsChannelIoEkonnect::getClassInfoStatic().nameGet(); 
-}
-
-// configuration pane itself
-//
-EsChannelIoEkonnectConfigPaneWnd::EsChannelIoEkonnectConfigPaneWnd(wxWindow* parent) :
-wxPanel(parent),
-m_intf(*this)
+EsChannelIoEkonnectConfigPane::EsChannelIoEkonnectConfigPane(wxWindow* parent) :
+EsReflectedClassConfigPane(
+  parent,
+  EsChannelIoEkonnect::classNameGetStatic()
+),
+m_btnResetToDefaults(nullptr),
+m_settings(nullptr),
+m_pnlStd(nullptr),
+m_lblDevice(nullptr),
+m_edDeviceName(nullptr),
+m_btnRescan(nullptr),
+m_lblBaud(nullptr),
+m_edBaud(nullptr),
+m_lblByteSize(nullptr),
+m_edByteSize(nullptr),
+m_lblParity(nullptr),
+m_edParity(nullptr),
+m_lblStopBits(nullptr),
+m_edStopBits(nullptr),
+m_pnlAdvanced(nullptr),
+m_lblRxTmo(nullptr),
+m_edRxTmo(nullptr),
+m_lblTxTmo(nullptr),
+m_edTxTmo(nullptr),
+m_lblRxBuffer(nullptr),
+m_edRxBuff(nullptr),
+m_lblTxBuffer(nullptr),
+m_edTxBuff(nullptr),
+m_chkResetOnRxTmo(nullptr),
+m_chkUseRS232(nullptr)
 {
-	wxBoxSizer* contents;
-	contents = new wxBoxSizer( wxVERTICAL );
-	
 	m_btnResetToDefaults = new wxButton( this, wxID_ANY, _("Reset to defaults"), wxDefaultPosition, wxDefaultSize, 0 );
-	contents->Add( m_btnResetToDefaults, 0, wxALL, 5 );
+	m_layContents.Add( m_btnResetToDefaults, 0, wxALL, 5 );
 	
 	m_settings = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_pnlStd = new wxPanel( m_settings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
@@ -231,7 +240,7 @@ m_intf(*this)
 	populateDevices();
 
 	// set-up control links
-	m_links
+	m_src
 		.linkAdd(EsEkonnectIoDevicePropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoEkonnect, device), m_edDeviceName, m_lblDevice, m_devices))
 		.linkAdd(EsComboBoxPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoEkonnect, baud), m_edBaud, m_lblBaud))
 		.linkAdd(EsComboBoxPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoEkonnect, bits), m_edByteSize, m_lblByteSize))
@@ -258,12 +267,12 @@ m_intf(*this)
 	}
 	
 	// Connect Events
-	m_btnResetToDefaults->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoEkonnectConfigPaneWnd::onResetToDefaults, this );
-	m_btnRescan->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoEkonnectConfigPaneWnd::onRescan, this );
+	m_btnResetToDefaults->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoEkonnectConfigPane::onResetToDefaults, this );
+	m_btnRescan->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoEkonnectConfigPane::onRescan, this );
 }
 
 // populate port selector
-void EsChannelIoEkonnectConfigPaneWnd::populateDevices()
+void EsChannelIoEkonnectConfigPane::populateDevices()
 {
 	m_edDeviceName->Clear();
 	// enumerate Ekonnect communication devices on this machine
@@ -274,13 +283,13 @@ void EsChannelIoEkonnectConfigPaneWnd::populateDevices()
 }
 
 // reset button click handler
-void EsChannelIoEkonnectConfigPaneWnd::onResetToDefaults(wxCommandEvent& WXUNUSED(evt))
+void EsChannelIoEkonnectConfigPane::onResetToDefaults(wxCommandEvent& WXUNUSED(evt))
 {
 	m_links.resetControlsToDefault();
 }
 
 // rescan button click
-void EsChannelIoEkonnectConfigPaneWnd::onRescan(wxCommandEvent& WXUNUSED(evt))
+void EsChannelIoEkonnectConfigPane::onRescan(wxCommandEvent& WXUNUSED(evt))
 {
 	populateDevices();
 }

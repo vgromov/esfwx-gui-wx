@@ -4,7 +4,7 @@ set(component_INTERNAL_NAME "escore-gui")
 set(component_ORIGINAL_NAME "escore-gui")
 set(component_BUILD_NUM 2)
 
-# Set-up ESCORE binary version naming
+# Set-up ESCORE GUI binary version naming
 set(ESGUI_CORE_VERSION_SUFFIX "${ESGUI_VERSION_SUFFIX}_${component_BUILD_NUM}" CACHE INTERNAL "")
 
 if(WIN32)

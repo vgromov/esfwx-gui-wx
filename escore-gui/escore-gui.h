@@ -81,6 +81,6 @@ enum {
 #include <escore-gui/EsListViewBase.h>
 #include <escore-gui/EsAppLog.h>
 #include <escore-gui/EsProgressMonitorView.h>
-//#include <escore-gui/EsReflectedClassConfigPane.h>
+#include <escore-gui/EsReflectedClassConfigPane.h>
 
 #endif // _es_core_gui_h_

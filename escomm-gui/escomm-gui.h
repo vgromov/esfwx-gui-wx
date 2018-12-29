@@ -13,23 +13,21 @@
 #	error "ekosf-core-gui.h must be included prior to this header!"
 #endif
 
-// communication stuff
-//
-// core export-import defines
-#ifdef EKOSF_USEDLLS
+// ESCOMM export-import defines
+#ifdef ES_DYNAMIC_LINKAGE
 #	ifdef ESCOMMGUI_EXPORTS
-#		define EKOSF_COMMGUI_CLASS	__declspec(dllexport)
-#		define EKOSF_COMMGUI_FUNC	__declspec(dllexport)
-#		define EKOSF_COMMGUI_DATA	__declspec(dllexport)
+#		define ESCOMM_GUI_CLASS	            ES_EXPORT_SPEC
+#		define ESCOMM_GUI_FUNC(type, decl)	ES_FUNCEXPORT_SPEC(type, decl)
+#		define ESCOMM_GUI_DATA(type, decl)	ES_DATAEXPORT_SPEC(type, decl)
 #	else
-#		define EKOSF_COMMGUI_CLASS	__declspec(dllimport)
-#		define EKOSF_COMMGUI_FUNC	__declspec(dllimport)
-#		define EKOSF_COMMGUI_DATA	__declspec(dllimport)
+#		define ESCOMM_GUI_CLASS	            ES_IMPORT_SPEC
+#		define ESCOMM_GUI_FUNC(type, decl)	ES_FUNCIMPORT_SPEC(type, decl)
+#		define ESCOMM_GUI_DATA(type, decl)	ES_DATAIMPORT_SPEC(type, decl)
 #	endif
 #else
-#	define EKOSF_COMMGUI_CLASS
-#	define EKOSF_COMMGUI_FUNC
-#	define EKOSF_COMMGUI_DATA
+#	define ESCOMM_GUI_CLASS
+#	define ESCOMM_GUI_FUNC(type, decl)    type decl
+#	define ESCOMM_GUI_DATA(type, decl)    type decl
 #endif
 
 class EsFrmCommLog;
