@@ -33,12 +33,12 @@ set(escommgui_common_SRCS
   escomm-gui.h
   EsCommConfigDlg.cpp
   EsCommConfigDlg.h
-  EsCommConfigPane.cpp
-  EsCommConfigPane.h
-  EsProtocolConfigPane.cpp
-  EsProtocolConfigPane.h
-  EsChannelIoConfigPaneFactory.cpp
-  EsChannelIoConfigPaneFactory.h
+  EsChannelIoConfigPane.cpp
+  EsChannelIoConfigPane.h
+  EsProtocolEcoeConfigPane.cpp
+  EsProtocolEcoeConfigPane.h
+  EsIoConfigPaneFactory.cpp
+  EsIoConfigPaneFactory.h
 )
 source_group(common FILES ${escommgui_common_SRCS})
 						

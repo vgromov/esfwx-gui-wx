@@ -39,7 +39,9 @@ void EsReflectedClassPropertyLink::sourceSet(EsReflectedClassDataSource* src)
   {
     if(m_src)
     {
-      m_src->linkRemove(this);
+      m_src->linkRemove(
+        shared_from_this()
+      );
       m_src = nullptr;
     }
 
@@ -50,7 +52,9 @@ void EsReflectedClassPropertyLink::sourceSet(EsReflectedClassDataSource* src)
 
     if(m_src)
     {
-      m_src->linkAdd(this);
+      m_src->linkAdd(
+        shared_from_this()
+      );
       // (re-) initialize stuff upon each link to source
       initialize();
       // (re-) set control to default upon each link to source
@@ -259,7 +263,7 @@ EsReflectedClassDataSource::~EsReflectedClassDataSource()
 }
 //---------------------------------------------------------------------------
 
-EsMetaclassIntf::Ptr EsReflectedClassDataSource::metaGet() const
+EsMetaclassIntf::Ptr EsReflectedClassDataSource::metaGet() const ES_NOTHROW
 {
   return m_meta;
 }
@@ -287,21 +291,33 @@ void EsReflectedClassDataSource::i18nStringsUpdate(const EsString& loc)
 }
 //---------------------------------------------------------------------------
 
-void EsReflectedClassDataSource::link(const EsReflectedClassPropertyLink::PtrT& link)
+void EsReflectedClassDataSource::link(const EsReflectedClassPropertyLink::Ptr& link)
 {
   ES_ASSERT(link);
   link->sourceSet(this);
 }
 //---------------------------------------------------------------------------
 
-void EsReflectedClassDataSource::linkAdd(const EsReflectedClassPropertyLink::PtrT& link)
+EsReflectedClassPropertyLink::Ptr EsReflectedClassDataSource::linkFind(const EsString& prop) const ES_NOTHROW
+{
+  for(auto item : m_links)
+  {
+    if( prop == item->propertyNameGet() )
+      return item;
+  }
+
+  return nullptr;
+}
+//--------------------------------------------------------------------------------
+
+void EsReflectedClassDataSource::linkAdd(const EsReflectedClassPropertyLink::Ptr& link)
 {
   ES_ASSERT(link);
   m_links.insert(link);
 }
 //---------------------------------------------------------------------------
 
-void EsReflectedClassDataSource::linkRemove(const EsReflectedClassPropertyLink::PtrT& link)
+void EsReflectedClassDataSource::linkRemove(const EsReflectedClassPropertyLink::Ptr& link)
 {
   ES_ASSERT(link);
   m_links.erase(link);
@@ -449,9 +465,9 @@ m_useLookup(useLookup)
 }
 //---------------------------------------------------------------------------
 
-EsReflectedClassPropertyLink::PtrT EsComboBoxPropertyLink::create(const EsString& prop, wxComboBox* cbx, wxStaticText* lbl /*= nullptr*/, bool useLookup /*= false*/)
+EsReflectedClassPropertyLink::Ptr EsComboBoxPropertyLink::create(const EsString& prop, wxComboBox* cbx, wxStaticText* lbl /*= nullptr*/, bool useLookup /*= false*/)
 {
-  PtrT ptr = ES_MAKE_SHARED(
+  Ptr ptr = ES_MAKE_SHARED(
     EsComboBoxPropertyLink,
     prop,
     cbx,
@@ -478,13 +494,71 @@ void EsComboBoxPropertyLink::i18nStringsUpdate(const EsString& ES_UNUSED(loc))
   if(!m_cbx)
     return;
 
+  initialize();
+}
+//---------------------------------------------------------------------------
+
+void EsComboBoxPropertyLink::itemsPopulate()
+{
+  ES_ASSERT(m_cbx);
   wxWindowUpdateLocker lock(m_cbx);
 
   int sel = m_cbx->GetSelection(); //< Save selection
   m_cbx->Clear();
 
-  initialize();
-  m_cbx->SetSelection(sel); //< Restore selection
+  const EsVariant& restriction = m_useLookup ?
+    lookupGet() :
+    restrictionGet();
+
+  if(!restriction.isEmpty())
+  {
+    if(m_useLookup)
+    {
+      const EsVariant::Array& va = restriction.asVariantCollection();
+      for(size_t idx = 0; idx < va.size(); ++idx)
+      {
+        const EsString& lbl = EsStringI18n::translate(
+          va[idx][0].asString()
+        );
+
+        m_cbx->AppendString(
+          lbl.c_str()
+        );
+      }
+    }
+    else if(restriction.isCollection())
+    {
+      const EsString::Array& sa = restriction.asStringCollection();
+      for(auto const& item : sa)
+        m_cbx->AppendString(
+          item.c_str()
+        );
+    }
+    else if(restriction.isObject())
+    {
+      EsReflectedClassIntf::Ptr _enum = restriction.asExistingObject();
+      ES_ASSERT(_enum);
+      if(_enum->isKindOf(EsEnumeration::classNameGetStatic()))
+      {
+        const EsString::Array& sa = _enum->propertyGet(esT("labels")).asStringCollection();
+        for(auto const& item : sa)
+          m_cbx->AppendString(
+            item.c_str()
+          );
+      }
+    }
+  }
+
+  if( wxNOT_FOUND != sel )
+  {
+    if( 0 != m_cbx->GetCount() )
+      if( sel >= static_cast<int>(m_cbx->GetCount()) )
+        sel = m_cbx->GetCount()-1;
+    else
+      sel = wxNOT_FOUND;
+  }
+
+  m_cbx->SetSelection(sel); //< Restore selection, if any
 }
 //---------------------------------------------------------------------------
 
@@ -509,51 +583,7 @@ void EsComboBoxPropertyLink::initialize()
     ).c_str()
   );
 
-  const EsVariant& restriction = m_useLookup ?
-    lookupGet() :
-    restrictionGet();
-
-  if(restriction.isEmpty())
-    return;
-
-  if(m_useLookup)
-  {
-    const EsVariant::Array& va = restriction.asVariantCollection();
-    wxWindowUpdateLocker lock(m_cbx);
-    for(size_t idx = 0; idx < va.size(); ++idx)
-    {
-      const EsString& lbl = EsStringI18n::translate(
-        va[idx][0].asString()
-      );
-
-      m_cbx->AppendString(
-        lbl.c_str()
-      );
-    }
-    return;
-  }
-
-  if(restriction.isCollection())
-  {
-    const EsString::Array& sa = restriction.asStringCollection();
-    for(auto const& item : sa)
-      m_cbx->AppendString(
-        item.c_str()
-      );
-  }
-  else if(restriction.isObject())
-  {
-    EsReflectedClassIntf::Ptr _enum = restriction.asExistingObject();
-    ES_ASSERT(_enum);
-    if(_enum->isKindOf(EsEnumeration::classNameGetStatic()))
-    {
-      const EsString::Array& sa = _enum->propertyGet(esT("labels")).asStringCollection();
-      for(auto const& item : sa)
-        m_cbx->AppendString(
-          item.c_str()
-        );
-    }
-  }
+  itemsPopulate();
 }
 //---------------------------------------------------------------------------
 
@@ -660,9 +690,9 @@ m_lbl(lbl)
 }
 //---------------------------------------------------------------------------
 
-EsReflectedClassPropertyLink::PtrT EsSpinCtlPropertyLink::create(const EsString& propName, wxSpinCtrl* ctl, wxStaticText* lbl /*= nullptr*/)
+EsReflectedClassPropertyLink::Ptr EsSpinCtlPropertyLink::create(const EsString& propName, wxSpinCtrl* ctl, wxStaticText* lbl /*= nullptr*/)
 {
-  PtrT ptr = ES_MAKE_SHARED(
+  Ptr ptr = ES_MAKE_SHARED(
     EsSpinCtlPropertyLink,
     propName,
     ctl,
@@ -784,9 +814,9 @@ m_lbl(lbl)
 }
 //---------------------------------------------------------------------------
 
-EsReflectedClassPropertyLink::PtrT EsSpinCtlDoublePropertyLink::create(const EsString& propName, wxSpinCtrlDouble* ctl, wxStaticText* lbl /*= nullptr*/)
+EsReflectedClassPropertyLink::Ptr EsSpinCtlDoublePropertyLink::create(const EsString& propName, wxSpinCtrlDouble* ctl, wxStaticText* lbl /*= nullptr*/)
 {
-  PtrT ptr = ES_MAKE_SHARED(
+  Ptr ptr = ES_MAKE_SHARED(
     EsSpinCtlDoublePropertyLink,
     propName,
     ctl,
@@ -916,9 +946,9 @@ m_lbl(lbl)
 }
 //---------------------------------------------------------------------------
 
-EsReflectedClassPropertyLink::PtrT EsTextCtlPropertyLink::create(const EsString& propName, wxTextCtrl* ctl, wxStaticText* lbl /*= nullptr*/)
+EsReflectedClassPropertyLink::Ptr EsTextCtlPropertyLink::create(const EsString& propName, wxTextCtrl* ctl, wxStaticText* lbl /*= nullptr*/)
 {
-  PtrT ptr = ES_MAKE_SHARED(
+  Ptr ptr = ES_MAKE_SHARED(
     EsTextCtlPropertyLink,
     propName,
     ctl,
@@ -1011,9 +1041,9 @@ m_ctl(cbx)
 }
 //---------------------------------------------------------------------------
 
-EsReflectedClassPropertyLink::PtrT EsCheckBoxPropertyLink::create(const EsString& propName, wxCheckBox* cbx)
+EsReflectedClassPropertyLink::Ptr EsCheckBoxPropertyLink::create(const EsString& propName, wxCheckBox* cbx)
 {
-  PtrT ptr = ES_MAKE_SHARED(
+  Ptr ptr = ES_MAKE_SHARED(
     EsCheckBoxPropertyLink,
     propName,
     cbx

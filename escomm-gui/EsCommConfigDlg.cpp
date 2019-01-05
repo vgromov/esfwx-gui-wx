@@ -1,19 +1,39 @@
-#include "StdAfx.h"
+#include "escomm_gui_pch.h"
 #pragma hdrstop
 
 #include "EsCommConfigDlg.h"
+//--------------------------------------------------------------------------------
 
-EsCommConfigDlg::EsCommConfigDlg(wxWindow* parent, bool showProtocolPane /*= false*/,
-	wxConfigBase* cfg /*= 0*/, const EsString& path /*= EsString::s_null*/) :
-wxDialog(parent, wxID_ANY, _("Communication configuration"), wxDefaultPosition),
-m_btnOK( new wxButton( this, wxID_OK ) ),
-m_btnCancel( new wxButton( this, wxID_CANCEL ) ),
-m_cfgPane(0)
+EsCommConfigDlg::EsCommConfigDlg(
+  wxWindow* parent, 
+  bool showProtocolPane /*= false*/,
+	wxConfigBase* cfg /*= nullptr*/, 
+  const EsString& path /*= EsString::null()*/
+) :
+wxDialog(
+  parent, 
+  wxID_ANY, 
+  _("Communication configuration"), 
+  wxDefaultPosition
+),
+m_paneChannel(nullptr),
+m_btnOK( nullptr ),
+m_btnCancel( nullptr )
 {
 	SetClientSize( wxSize(380, 300) );
+
 	wxBoxSizer* contents = new wxBoxSizer( wxVERTICAL );
+  ES_ASSERT(contents);
+
 	wxStdDialogButtonSizer* buttons = new wxStdDialogButtonSizer();
-	
+	ES_ASSERT(buttons);
+
+  m_btnOK = new wxButton( this, wxID_OK );
+  ES_ASSERT(m_btnOK);
+
+  m_btnCancel = new wxButton( this, wxID_CANCEL );
+  ES_ASSERT(m_btnCancel);
+
 	buttons->AddButton( m_btnOK );
 	buttons->AddButton( m_btnCancel );
 	buttons->Realize();
@@ -21,30 +41,66 @@ m_cfgPane(0)
 	if( showProtocolPane )
 	{
 		wxNotebook* nb = new wxNotebook(this, wxID_ANY);
-		m_cfgPane = new EsCommConfigPane(nb, cfg, path);
-		wxASSERT(m_cfgPane);
-		nb->AddPage(m_cfgPane, _("Channel"), true);
-		EsVariant wxObj(nb);
-		m_protocolPane = EsClassInfo::getClassInfo(wxT("EsProtocolConfigPane"))->
-			classCall(c_reflectedCtrName, wxObj).asExistingObject();
-		wxASSERT(m_protocolPane);
-		nb->AddPage(m_protocolPane->getWindow(), _("Protocol"));
-		contents->Add(nb, wxSizerFlags().Expand());
+    ES_ASSERT(nb);
+
+		m_paneChannel = new EsChannelIoConfigPane(
+      nb, 
+      cfg, 
+      path
+    );
+    ES_ASSERT(m_paneChannel);
+
+		nb->AddPage(
+      m_paneChannel, 
+      _("Channel"), 
+      true
+    );
+		
+    m_paneProtocol = EsIoConfigPaneFactory::create(
+      EsRpcMaster::classNameGetStatic(),
+      nb
+    );
+		nb->AddPage(
+      m_paneProtocol->paneGet(), 
+      _("Protocol")
+    );
+		
+    contents->Add(
+      nb, 
+      wxSizerFlags().Expand()
+    );
 	}
 	else
 	{
-		m_cfgPane = new EsCommConfigPane(this, cfg, path);
-		wxASSERT(m_cfgPane);
-		contents->Add(m_cfgPane, wxSizerFlags().Expand());		
+		m_paneChannel = new EsChannelIoConfigPane(
+      this, 
+      cfg, 
+      path
+    );
+		ES_ASSERT(m_paneChannel);
+
+		contents->Add(
+      m_paneChannel, 
+      wxSizerFlags().Expand()
+    );		
 	}	
 
-	contents->Add( buttons, wxSizerFlags().Expand().Border() );
+	contents->Add( 
+    buttons, 
+    wxSizerFlags().Expand().Border() 
+  );
 			
 	SetSizer( contents );
-	if( parent )
-		EsUtilities::ctlsFontApply(this, parent->GetFont());
-	Layout();
+	
+  if( parent )
+		EsUtilities::ctlsFontApply(
+      this, 
+      parent->GetFont()
+    );
+	
+  Layout();
 	Fit();
 
 	CenterOnScreen();
 }
+//--------------------------------------------------------------------------------

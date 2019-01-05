@@ -1,16 +1,16 @@
 #ifndef _ekosf_comm_gui_h_
 #define _ekosf_comm_gui_h_
 
-#ifndef _ekosf_core_h_
-#	error "ekosf-core.h must be included prior to this header!"
+#ifndef _es_core_h_
+#	error "escore.h must be included prior to this header!"
 #endif
 
-#ifndef _ekosf_comm_h_
-#	error "ekosf-comm.h must be included prior to this header!"
+#ifndef _es_comm_h_
+#	error "escomm.h must be included prior to this header!"
 #endif
 
-#ifndef _ekosf_core_gui_h_
-#	error "ekosf-core-gui.h must be included prior to this header!"
+#ifndef _es_core_gui_h_
+#	error "escore-gui.h must be included prior to this header!"
 #endif
 
 // ESCOMM export-import defines
@@ -35,16 +35,16 @@ class EsCommConfigPane;
 class EsProtocolConfigPane;
 class EsCommConfigDlg;
 
-#include <escomm-gui/EsCommConfigPane.h>
+#include <escomm-gui/EsChannelIoConfigPane.h>
 #include <escomm-gui/EsCommConfigDlg.h>
 #include <escomm-gui/EsChannelIoStubConfigPane.h>
 #include <escomm-gui/EsChannelIoUartConfigPane.h>
 #include <escomm-gui/EsChannelIoEkonnectConfigPane.h>
 #include <escomm-gui/EsChannelIoSocketClientConfigPane.h>
 #include <escomm-gui/EsChannelIoSocketServerConfigPane.h>
-#include <escomm-gui/EsProtocolConfigPane.h>
-#include <escomm-gui/EsChannelIoConfigPaneFactory.h>
+#include <escomm-gui/EsProtocolEcoeConfigPane.h>
+#include <escomm-gui/EsIoConfigPaneFactory.h>
 
-ES_DECL_REFLECTION_REGISTRAR(escommgui)
+ES_DECL_REFLECTION_REGISTRAR(ESCOMM_GUI_FUNC, escommgui)
 
 #endif // _ekosf_comm_h_
