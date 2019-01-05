@@ -28,6 +28,18 @@ void EsUtilities::wxArrayStringToEsStringArray(EsString::Array& dest, const wxAr
 }
 //--------------------------------------------------------------------------------
 
+EsString::Array EsUtilities::wxArrayStringToEsStringArray(const wxArrayString& src)
+{
+  EsString::Array result;
+  wxArrayStringToEsStringArray(
+    result,
+    src
+  );
+
+  return result;
+}
+//--------------------------------------------------------------------------------
+
 void EsUtilities::esStringArrayToWxArrayString(wxArrayString& dest, const EsString::Array& src)
 {
   dest.clear();
@@ -36,6 +48,18 @@ void EsUtilities::esStringArrayToWxArrayString(wxArrayString& dest, const EsStri
     dest.push_back(
       item.c_str()
     );
+}
+//--------------------------------------------------------------------------------
+
+wxArrayString EsUtilities::esStringArrayToWxArrayString(const EsString::Array& src)
+{
+  wxArrayString result;
+  esStringArrayToWxArrayString(
+    result,
+    src
+  );
+
+  return result;
 }
 //--------------------------------------------------------------------------------
 
@@ -60,6 +84,49 @@ void EsUtilities::esStringArrayToMru(wxFileHistory& dest, const EsString::Array&
     dest.AddFileToHistory(
       src[idx].c_str()
     );
+}
+//--------------------------------------------------------------------------------
+
+wxDateTime EsUtilities::esDateTimeToWxDateTime(const EsDateTime& dt)
+{
+	// NB. wxDateTime uses 0-based month values
+	return wxDateTime( 
+    dt.get_dayOfMonth(), 
+    static_cast<wxDateTime::Month>(dt.get_month()-1), 
+    dt.get_year(), 
+    dt.get_hours(), 
+    dt.get_minutes(), 
+    dt.get_seconds(), 
+    dt.get_milliseconds()
+  );
+}
+//--------------------------------------------------------------------------------
+
+EsDateTime EsUtilities::wxDateTimeToEsDateTime(const wxDateTime& dt)
+{
+	wxDateTime::Tm tm = dt.GetTm();
+	// NB. wxDateTime uses 0-based month values
+	EsDateTime result;
+  result.compose(
+    tm.year, 
+    static_cast<int>(tm.mon)+1, 
+    tm.mday, 
+    tm.hour, 
+    tm.min, 
+    tm.sec, 
+    tm.msec
+  );
+
+	return result;
+}
+//--------------------------------------------------------------------------------
+
+void EsUtilities::wxDateTimeTimeToEsDateTime(EsDateTime& dest, const wxDateTime& dt)
+{
+  dest.set_hours( dt.GetHour() );
+  dest.set_minutes( dt.GetMinute() );
+  dest.set_seconds( dt.GetSecond() );
+  dest.set_milliseconds( dt.GetMillisecond() );
 }
 //--------------------------------------------------------------------------------
 
@@ -489,7 +556,6 @@ wxMenu* EsUtilities::menuCloneCreate(const wxMenu* src)
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
-// return top level window given the current one
 wxWindow* EsUtilities::topLevelWindowGetFor(wxWindow* wnd)
 {
   while(wnd)
@@ -505,8 +571,6 @@ wxWindow* EsUtilities::topLevelWindowGetFor(wxWindow* wnd)
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
-// GUI adjustments
-//
 static void menuFontSet(wxMenu* menu, const wxFont& fnt)
 {
 #if ES_OS == ES_OS_WINDOWS
@@ -816,6 +880,24 @@ int EsUtilities::longestStringWidthGet(const EsString::Array& strings, const wxW
       wnd.GetTextExtent(strings[idx].c_str(), &w, &h, 0, 0, &fnt);
     else
       wnd.GetTextExtent(strings[idx].c_str(), &w, &h);
+    result = wxMax(result, w);
+  }
+
+  return result;
+}
+//--------------------------------------------------------------------------------
+
+int EsUtilities::longestStringWidthGet(const wxArrayString& strings, const wxWindow& wnd, const wxFont& fnt)
+{
+  int result = 0;
+
+  for(size_t idx = 0; idx < strings.size(); ++idx)
+  {
+    int w, h;
+    if(!fnt.IsNull())
+      wnd.GetTextExtent(strings[idx], &w, &h, 0, 0, &fnt);
+    else
+      wnd.GetTextExtent(strings[idx], &w, &h);
     result = wxMax(result, w);
   }
 

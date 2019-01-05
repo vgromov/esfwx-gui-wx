@@ -1,5 +1,5 @@
-#ifndef _std_afx_h_
-#define _std_afx_h_
+#ifndef _es_comm_gui_pch_h_
+#define _es_comm_gui_pch_h_
 // header for precompiled symbols generation
 //
 
@@ -11,4 +11,4 @@
 // own include
 #include "escomm-gui.h"
 
-#endif // _std_afx_h_
+#endif // _es_comm_gui_pch_h_

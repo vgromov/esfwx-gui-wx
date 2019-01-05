@@ -3,6 +3,69 @@
 
 #include "EsReflectedClassConfigPane.h"
 //---------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+
+EsReflectedClassConfigPane::
+Impl::Impl(EsReflectedClassConfigPane& pane) ES_NOTHROW :
+m_pane(pane)
+{
+  m_dynamic = true;
+}
+//--------------------------------------------------------------------------------
+
+EsString EsReflectedClassConfigPane::Impl::typeNameGet() const ES_NOTHROW
+{
+  return m_pane.supportedTypeNameGet() + esT("ConfigPane");
+}
+//--------------------------------------------------------------------------------
+
+void EsReflectedClassConfigPane::Impl::destroy() ES_NOTHROW
+{
+  m_destroying = true;
+  m_pane.destroy();
+}
+//--------------------------------------------------------------------------------
+
+EsString EsReflectedClassConfigPane::Impl::objectClassNameGet() const ES_NOTHROW
+{
+  return m_pane.supportedTypeNameGet();
+}
+//--------------------------------------------------------------------------------
+
+wxWindow* EsReflectedClassConfigPane::Impl::paneGet() ES_NOTHROW
+{
+  return &m_pane;
+}
+//--------------------------------------------------------------------------------
+
+wxWindow* EsReflectedClassConfigPane::Impl::parentGet() const ES_NOTHROW
+{
+  return m_pane.GetParent();
+}
+//--------------------------------------------------------------------------------
+
+wxSizer* EsReflectedClassConfigPane::Impl::contentsGet() const ES_NOTHROW
+{
+  return m_pane.m_layContents;
+}
+//--------------------------------------------------------------------------------
+
+void EsReflectedClassConfigPane::Impl::controlsUpdateFromObject(const EsVariant& obj)
+{
+  m_pane.applyFromObject(
+    obj.asObject()
+  );
+}
+//--------------------------------------------------------------------------------
+
+void EsReflectedClassConfigPane::Impl::objectUpdateFromControls(const EsVariant& obj) const
+{
+  m_pane.applyToObject(
+    obj.asExistingObject()
+  );
+}
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 
 EsReflectedClassConfigPane::EsReflectedClassConfigPane(
   wxWindow* parent, 
@@ -10,6 +73,8 @@ EsReflectedClassConfigPane::EsReflectedClassConfigPane(
 	const EsMetaclassIntf::Ptr& meta /*= nullptr*/
 ) :
 wxPanel(parent),
+m_intf(*this),
+m_layContents(nullptr),
 m_src(
   this,
   className,
@@ -17,11 +82,28 @@ m_src(
 ),
 m_applyingFromObject(false)
 {
+  m_layContents = new wxFlexGridSizer(1); //< Start with single column layout
+  ES_ASSERT(m_layContents);
+
   SetSizer(
-    &m_layContents
+    m_layContents
   );
 }
 //---------------------------------------------------------------------------
+
+EsReflectedObjectConfigPaneIntf::Ptr EsReflectedClassConfigPane::intfGet() ES_NOTHROW
+{
+  return m_intf.asIntfT<EsReflectedObjectConfigPaneIntf>();
+}
+//--------------------------------------------------------------------------------
+
+void EsReflectedClassConfigPane::destroy() ES_NOTHROW
+{
+  Hide();
+  SetParent(nullptr);
+  Close(true); //< Calling proper delayed destruction
+}
+//--------------------------------------------------------------------------------
 
 void EsReflectedClassConfigPane::i18nStringsUpdate(const EsString& loc)
 {

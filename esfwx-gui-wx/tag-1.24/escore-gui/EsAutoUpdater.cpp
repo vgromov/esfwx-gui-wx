@@ -35,21 +35,20 @@ EsAutoUpdater::EsAutoUpdater() :
 
   if(m_ws && m_ws->isOk())
   {
-    win_sparkle_set_lang = (pfn_win_sparkle_set_lang)m_ws->procAddrGet(esT("win_sparkle_set_lang"), false);
-    win_sparkle_init = (pfn_win_sparkle_init)m_ws->procAddrGet(esT("win_sparkle_init"), false);
-    win_sparkle_cleanup = (pfn_win_sparkle_cleanup)m_ws->procAddrGet(esT("win_sparkle_cleanup"), false);
-    win_sparkle_set_appcast_url = (pfn_win_sparkle_set_appcast_url)m_ws->procAddrGet(esT("win_sparkle_set_appcast_url"), false);
-    win_sparkle_set_app_details = (pfn_win_sparkle_set_app_details)m_ws->procAddrGet(esT("win_sparkle_set_app_details"), false);
-    win_sparkle_get_last_check_time = (pfn_win_sparkle_get_last_check_time)m_ws->procAddrGet(esT("win_sparkle_get_last_check_time"), false);
-    win_sparkle_set_automatic_check_for_updates = (pfn_win_sparkle_set_automatic_check_for_updates)m_ws->procAddrGet(esT("win_sparkle_set_automatic_check_for_updates"), false);
-    win_sparkle_get_automatic_check_for_updates = (pfn_win_sparkle_get_automatic_check_for_updates)m_ws->procAddrGet(esT("win_sparkle_get_automatic_check_for_updates"), false);
-    win_sparkle_set_update_check_interval = (pfn_win_sparkle_set_update_check_interval)m_ws->procAddrGet(esT("win_sparkle_set_update_check_interval"), false);
-    win_sparkle_get_update_check_interval = (pfn_win_sparkle_get_update_check_interval)m_ws->procAddrGet(esT("win_sparkle_get_update_check_interval"), false);
-    win_sparkle_check_update_with_ui = (pfn_win_sparkle_check_update_with_ui)m_ws->procAddrGet(esT("win_sparkle_check_update_with_ui"), false);
+    win_sparkle_set_lang = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_set_lang>(m_ws->procAddrGet(esT("win_sparkle_set_lang"), false));
+    win_sparkle_init = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_init>(m_ws->procAddrGet(esT("win_sparkle_init"), false));
+    win_sparkle_cleanup = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_cleanup>(m_ws->procAddrGet(esT("win_sparkle_cleanup"), false));
+    win_sparkle_set_appcast_url = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_set_appcast_url>(m_ws->procAddrGet(esT("win_sparkle_set_appcast_url"), false));
+    win_sparkle_set_app_details = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_set_app_details>(m_ws->procAddrGet(esT("win_sparkle_set_app_details"), false));
+    win_sparkle_get_last_check_time = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_get_last_check_time>(m_ws->procAddrGet(esT("win_sparkle_get_last_check_time"), false));
+    win_sparkle_set_automatic_check_for_updates = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_set_automatic_check_for_updates>(m_ws->procAddrGet(esT("win_sparkle_set_automatic_check_for_updates"), false));
+    win_sparkle_get_automatic_check_for_updates = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_get_automatic_check_for_updates>(m_ws->procAddrGet(esT("win_sparkle_get_automatic_check_for_updates"), false));
+    win_sparkle_set_update_check_interval = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_set_update_check_interval>(m_ws->procAddrGet(esT("win_sparkle_set_update_check_interval"), false));
+    win_sparkle_get_update_check_interval = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_get_update_check_interval>(m_ws->procAddrGet(esT("win_sparkle_get_update_check_interval"), false));
+    win_sparkle_check_update_with_ui = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_check_update_with_ui>(m_ws->procAddrGet(esT("win_sparkle_check_update_with_ui"), false));
 
-    win_sparkle_check_update_without_ui = (pfn_win_sparkle_check_update_without_ui)m_ws->procAddrGet(esT("win_sparkle_check_update_without_ui"), false);
-
-
+    win_sparkle_check_update_without_ui = esCallCastToCall<EsDynamicLibrary::Pfn, pfn_win_sparkle_check_update_without_ui>(m_ws->procAddrGet(esT("win_sparkle_check_update_without_ui"), false));
+   
     m_setup =
       win_sparkle_init &&
       win_sparkle_cleanup &&

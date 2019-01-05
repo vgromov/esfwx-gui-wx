@@ -1,18 +1,6 @@
 #ifndef _es_reflection_gui_links_h_
 #define _es_reflection_gui_links_h_
 
-/// Object configuration pane interface
-///
-ES_DECL_INTF_BEGIN(8CC19CF9, D0B24b4c, 8D361982, 26E276BA, EsReflectedObjectConfigPaneIntf)
-  ES_DECL_INTF_METHOD(EsString, objectClassNameGet)() const = 0;
-  /// Access pane owner form
-  ES_DECL_INTF_METHOD(wxWindow*, ownerGet)() = 0;
-  /// Update pane controls from linked Reflected object source
-  ES_DECL_INTF_METHOD(void, controlsUpdateFromObject)(const EsReflectedClassIntf::Ptr& obj) = 0;
-  /// Update Reflected object properties from linked controls
-  ES_DECL_INTF_METHOD(void, objectUpdateFromControls)(const EsReflectedClassIntf::Ptr& obj) const = 0;
-ES_DECL_INTF_END
-
 /// Reflectd property link classes FWD decls
 ///
 class EsReflectedClassDataSource;
@@ -24,10 +12,10 @@ typedef std::function<void (EsReflectedClassPropertyLink& link)> EsOnSrcObjectSe
 typedef std::function<void (EsReflectedClassPropertyLink& link)> EsOnCtlStateChanged;
 typedef std::function<void (EsReflectedClassPropertyLink& sender, const EsVariant& val, EsVariant& suggestedVal)> EsOnCtlValInvalid;
 
-class ESCORE_GUI_CLASS EsReflectedClassPropertyLink
+class ESCORE_GUI_CLASS EsReflectedClassPropertyLink : public std::enable_shared_from_this<EsReflectedClassPropertyLink>
 {
 public:
-  typedef std::shared_ptr<EsReflectedClassPropertyLink> PtrT;
+  typedef std::shared_ptr<EsReflectedClassPropertyLink> Ptr;
 
 protected:
   EsReflectedClassPropertyLink(wxControl* ref, const EsString& propName);
@@ -90,7 +78,7 @@ private:
 
 /// Property links collection for group access to reflected class properties
 ///
-typedef std::set< EsReflectedClassPropertyLink::PtrT > EsReflectedClassPropertyLinksT;
+typedef std::set< EsReflectedClassPropertyLink::Ptr > EsReflectedClassPropertyLinksT;
 
 class ESCORE_GUI_CLASS EsReflectedClassDataSource
 {
@@ -100,12 +88,24 @@ public:
 
   const EsString& objectClassNameGet() const;
 
-  EsMetaclassIntf::Ptr metaGet() const;
+  EsMetaclassIntf::Ptr metaGet() const ES_NOTHROW;
   void metaSet(const EsMetaclassIntf::Ptr& meta);
 
   inline bool isReadOnly() const ES_NOTHROW { return m_readOnly; }
   
-  void link(const EsReflectedClassPropertyLink::PtrT& link);
+  void link(const EsReflectedClassPropertyLink::Ptr& link);
+
+  EsReflectedClassPropertyLink::Ptr linkFind(const EsString& prop) const ES_NOTHROW;
+
+  template <typename LinkTypeT>
+  LinkTypeT* linkFind(const EsString& prop) const ES_NOTHROW
+  {
+    EsReflectedClassPropertyLink::Ptr ptr = linkFind(prop);
+    if( ptr )
+      return dynamic_cast<LinkTypeT*>(ptr.get());
+
+    return nullptr;
+  }
 
   void controlsUpdateFromObject(const EsReflectedClassIntf::Ptr& obj);
   void objectUpdateFromControls(const EsReflectedClassIntf::Ptr& obj) const;
@@ -114,8 +114,8 @@ public:
   virtual void i18nStringsUpdate(const EsString& loc);
 
 protected:
-  void linkAdd(const EsReflectedClassPropertyLink::PtrT& link);
-  void linkRemove(const EsReflectedClassPropertyLink::PtrT& link);
+  void linkAdd(const EsReflectedClassPropertyLink::Ptr& link);
+  void linkRemove(const EsReflectedClassPropertyLink::Ptr& link);
   void classNameCheck(const EsReflectedClassIntf::Ptr& obj) const;
 
 protected:
@@ -185,7 +185,7 @@ protected:
   EsComboBoxPropertyLink(const EsString& prop, wxComboBox* cbx, wxStaticText* lbl, bool useLookup);
 
 public:
-  static EsReflectedClassPropertyLink::PtrT create(const EsString& prop, wxComboBox* cbx, wxStaticText* lbl = nullptr, bool useLookup = false);
+  static EsReflectedClassPropertyLink::Ptr create(const EsString& prop, wxComboBox* cbx, wxStaticText* lbl = nullptr, bool useLookup = false);
 
   virtual bool isUnidirectional() const ES_OVERRIDE;
 
@@ -193,6 +193,7 @@ public:
 
 protected:
   virtual void initialize();
+  virtual void itemsPopulate();
   virtual void doControlValSet(const EsVariant& val);
   virtual EsVariant doControlValGet() const;
 
@@ -210,7 +211,7 @@ protected:
   EsSpinCtlPropertyLink(const EsString& propName, wxSpinCtrl* ctl, wxStaticText* lbl);
 
 public:
-  static EsReflectedClassPropertyLink::PtrT create(const EsString& propName, wxSpinCtrl* ctl, wxStaticText* lbl = nullptr);
+  static EsReflectedClassPropertyLink::Ptr create(const EsString& propName, wxSpinCtrl* ctl, wxStaticText* lbl = nullptr);
 
   virtual bool isUnidirectional() const ES_OVERRIDE;
 
@@ -234,7 +235,7 @@ protected:
   EsSpinCtlDoublePropertyLink(const EsString& propName, wxSpinCtrlDouble* ctl, wxStaticText* lbl);
 
 public:
-  static EsReflectedClassPropertyLink::PtrT create(const EsString& propName, wxSpinCtrlDouble* ctl, wxStaticText* lbl = nullptr);
+  static EsReflectedClassPropertyLink::Ptr create(const EsString& propName, wxSpinCtrlDouble* ctl, wxStaticText* lbl = nullptr);
 
   virtual bool isUnidirectional() const ES_OVERRIDE;
 
@@ -258,7 +259,7 @@ protected:
   EsTextCtlPropertyLink(const EsString& propName, wxTextCtrl* ctl, wxStaticText* lbl);
 
 public:
-  static EsReflectedClassPropertyLink::PtrT create(const EsString& propName, wxTextCtrl* ctl, wxStaticText* lbl = nullptr);
+  static EsReflectedClassPropertyLink::Ptr create(const EsString& propName, wxTextCtrl* ctl, wxStaticText* lbl = nullptr);
 
   virtual bool isUnidirectional() const ES_OVERRIDE;
 
@@ -282,7 +283,7 @@ protected:
   EsCheckBoxPropertyLink(const EsString& propName, wxCheckBox* cbx);
 
 public:
-  static EsReflectedClassPropertyLink::PtrT create(const EsString& propName, wxCheckBox* cbx);
+  static EsReflectedClassPropertyLink::Ptr create(const EsString& propName, wxCheckBox* cbx);
 
   virtual bool isUnidirectional() const ES_OVERRIDE;
   

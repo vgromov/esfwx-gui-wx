@@ -1,15 +1,16 @@
 #ifndef _ekonnect_io_channel_config_pane_h_
 #define _ekonnect_io_channel_config_pane_h_
 
-class ESCOMM_GUI_CLASS EsChannelIoEkonnectConfigPane : EsReflectedClassConfigPane
+class ESCOMM_GUI_CLASS EsChannelIoEkonnectConfigPane : public EsReflectedClassConfigPane
 {
-public:
+protected:
 	EsChannelIoEkonnectConfigPane(wxWindow* parent);
 
-protected:
-	// selectors population helpers
-	void populateDevices();
+public:
+  static EsReflectedObjectConfigPaneIntf::Ptr create(wxWindow* parent);
+  virtual ~EsChannelIoEkonnectConfigPane();
 
+protected:
 	// reset button click handler
 	void onResetToDefaults(wxCommandEvent& evt);
 

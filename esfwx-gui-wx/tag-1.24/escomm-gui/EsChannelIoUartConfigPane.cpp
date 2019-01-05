@@ -1,124 +1,165 @@
 #include "escomm_gui_pch.h"
 #pragma hdrstop
 
-#include <wx/spinctrl.h>
 #include "EsChannelIoUartConfigPane.h"
+
+// TODO: move resource to the art provider
 #include "res/rescan.xpm"
 
-const wxChar* c_sysPortPrefix = wxT("\\\\.\\");
-
-// custom property link for com port enumeration
-//
-// combo box link
-class EsUartIoPortPropertyLink : public EsPropertyLink
+class EsUartIoPortPropertyLink : public EsComboBoxPropertyLink
 {
 protected:
-	EsUartIoPortPropertyLink(const EsPropertyInfo& propInfo,
-		wxComboBox* cbx, wxStaticText* lbl, const EsCommPortInfos& portInfos) :
-	EsPropertyLink(propInfo),
-	m_cbx(0),
-	m_lbl(0),
-	m_portInfos(portInfos)
-	{
-		init(cbx, lbl);
-	}
+	EsUartIoPortPropertyLink(
+	  EsChannelIoUartConfigPane& pane,    
+    const EsString& prop,
+		wxComboBox* cbx, 
+    wxStaticText* lbl
+  ) :
+	EsComboBoxPropertyLink(
+    prop,
+    cbx,
+    lbl,
+    false
+  ),
+  m_pane(pane)
+	{}
 
 public:
-	static EsPropertyLink::Ptr create(const EsPropertyInfo& propInfo,
-		wxComboBox* cbx, wxStaticText* lbl, const EsCommPortInfos& portInfos)
+	static EsReflectedClassPropertyLink::Ptr create(	  
+    EsChannelIoUartConfigPane& pane,    
+    const EsString& prop,
+		wxComboBox* cbx, 
+    wxStaticText* lbl
+  )
 	{
-		EsPropertyLink::Ptr result(new EsUartIoPortPropertyLink(propInfo, cbx, lbl, portInfos));
-		result->resetControlToDefault();
+		EsReflectedClassPropertyLink::Ptr result(
+      new EsUartIoPortPropertyLink(
+        pane,
+        prop, 
+        cbx, 
+        lbl
+      )
+    );
+
 		return result;
 	}
 	
-	virtual void updateControl(const EsReflectedClassIntf::Ptr& obj)
-	{
-		wxASSERT(obj);
-		wxASSERT(obj->is(m_propInfo.getClassInfo().nameGet()));
-		
-		EsString port = m_propInfo.get(obj.request<EsBaseIntf>().get()).asString();
-		const EsCommPortInfo& infoByName = m_portInfos.findPortInfoByPortName( port );
-		if( infoByName.isOk() )
-			m_cbx->SetValue( infoByName.m_strFriendlyName.c_str() );
-		else
-		{
-			const EsCommPortInfo& infoByDev = m_portInfos.findPortInfoByDevPath( port );
-			if( infoByDev.isOk() )
-				m_cbx->SetValue( infoByDev.m_strFriendlyName.c_str() );
-			else
-				m_cbx->SetSelection(-1);
-		}
-	}
-	
-	virtual void updateProperty(const EsReflectedClassIntf::Ptr& obj) const
-	{
-		wxASSERT(obj);
-		wxASSERT(obj->is(m_propInfo.getClassInfo().nameGet()));
-		int sel = m_cbx->GetSelection();
-		if( -1 < sel )
-			m_propInfo.set(obj.request<EsBaseIntf>().get(), m_portInfos[sel].m_strDevPath);	
-	}
-	
-	virtual void resetControlToDefault()
-	{
-		// set default port
-		if( !m_portInfos.empty() )
-		{
-			wxString simpleName;
-			wxString portName = m_propInfo.defaultGet().asString();
-			if( !portName.StartsWith(c_sysPortPrefix, &simpleName) )
-				simpleName = portName;
-			const EsCommPortInfo& info = m_portInfos.findPortInfoByPortName(simpleName);
-			if( info.isOk() )
-				m_cbx->SetValue(info.m_strFriendlyName.c_str());
-			else
-				m_cbx->SetValue(wxEmptyString);
-		}
-	}
+  virtual void itemsPopulate() ES_OVERRIDE
+  {
+    ES_ASSERT(m_cbx);
+    wxWindowUpdateLocker lock(m_cbx);
+    
+    int sel = m_cbx->GetSelection(); //< Save selection
+    m_cbx->Clear();
+
+    m_devices = EsChannelIoUart::enumerate(
+      EsVariant(false), //< Do not include busy ports
+      EsVariant(false)  //< Do not restrict ourselves to USB-only devices
+    ).asVariantCollection();
+
+    for(auto const& device : m_devices)
+      m_cbx->AppendString(
+        device[2].asString().c_str() //< Device human-readable string
+      );
+   
+    if( wxNOT_FOUND != sel )
+    {
+      if( 0 != m_cbx->GetCount() )
+      {
+        if( sel >= static_cast<int>(m_cbx->GetCount()) )
+          sel = m_cbx->GetCount()-1;
+
+	      // adjust width to fit longest string inside port names list
+	      wxSize sze = m_cbx->GetClientSize();
+	      sze.x -= wxSystemSettings::GetMetric( wxSYS_HTHUMB_X ) + 2 * wxSystemSettings::GetMetric( wxSYS_EDGE_X );
+	      int delta = wxMax( 
+          EsUtilities::longestStringWidthGet(
+            m_cbx->GetStrings(), 
+            *m_cbx, 
+            m_cbx->GetFont()
+          ), 
+          sze.x
+        ) - sze.x;
+	      
+        if( 0 < delta )
+	      {
+		      sze = m_pane.GetClientSize();
+		      sze.x += delta;
+		      m_pane.SetClientSize(sze);
+		      m_pane.Layout();
+	      }
+      }
+      else
+        sel = wxNOT_FOUND;
+    }
+
+    m_cbx->SetSelection(sel); //< Restore selection, if any
+  }
 
 protected:
-	void init(wxComboBox* cbx, wxStaticText* lbl)
+	virtual void doControlValSet(const EsVariant& val) ES_OVERRIDE
 	{
-		m_lbl = lbl;
-		if( m_lbl )
-			m_lbl->SetLabel( m_propInfo.labelGet() + wxT(":") );
+    int sel = wxNOT_FOUND;
+    for(size_t idx = 0; idx < m_devices.size(); ++idx)
+    {
+      const EsVariant& device = m_devices[idx];
+      if( device[0] == val )
+      {
+        sel = idx;
+        break;
+      }
+    }
 
-		wxASSERT(cbx);
-		m_cbx = cbx;
+    ES_ASSERT(m_cbx);
+		m_cbx->SetSelection(sel);
 	}
+	
+	virtual EsVariant doControlValGet() const ES_OVERRIDE
+	{
+    ES_ASSERT(m_cbx);
+    int sel = m_cbx->GetSelection();
+
+    if( sel != wxNOT_FOUND && sel < static_cast<int>(m_devices.size()) )
+      return m_devices[sel][0];
+
+		return EsString::null();
+  }
 
 protected:
-	wxComboBox* m_cbx;
-	wxStaticText* m_lbl;
-	const EsCommPortInfos& m_portInfos;
+  EsChannelIoUartConfigPane& m_pane;
+  EsVariant::Array m_devices;
 };
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 
-// configuration pane interface implementor proxy
-//
-ES_DECL_NESTED_BASE_CLASS_INFO_BEGIN(EsChannelIoUartConfigPaneWnd::EsChannelIoUartConfigPane, EsChannelIoUartConfigPane, _i("UART channel configuration GUI."))
-	// class services
-	ES_DECL_REFLECTED_CTOR_INFO(EsChannelIoUartConfigPaneWnd::EsChannelIoUartConfigPane, EsBaseIntfPtr_ClassCall_p_wxObject, _i("EsChannelIoUartConfigPane constructor."))
-ES_DECL_CLASS_INFO_END
-
-EsChannelIoUartConfigPaneWnd::EsChannelIoUartConfigPane::~EsChannelIoUartConfigPane() {}
-
-EsString EsChannelIoUartConfigPaneWnd::EsChannelIoUartConfigPane::getObjectName() const 
-{ 
-	return EsRpcMaster::getClassInfoStatic().nameGet(); 
-}
-
-// configuration pane itself
-//
-EsChannelIoUartConfigPaneWnd::EsChannelIoUartConfigPaneWnd(wxWindow* parent) :
-wxPanel(parent),
-m_intf(*this)
+EsChannelIoUartConfigPane::EsChannelIoUartConfigPane(wxWindow* parent) :
+EsReflectedClassConfigPane(
+  parent,
+  EsChannelIoEkonnect::classNameGetStatic()
+),
+m_btnResetToDefaults(nullptr),
+m_settings(nullptr),
+m_pnlStd(nullptr),
+m_lblPort(nullptr),
+m_edPortName(nullptr),
+m_btnRescan(nullptr),
+m_lblBaud(nullptr),
+m_edBaud(nullptr),
+m_lblByteSize(nullptr),
+m_edByteSize(nullptr),
+m_lblParity(nullptr),
+m_edParity(nullptr),
+m_lblStopBits(nullptr),
+m_edStopBits(nullptr),
+m_pnlAdvanced(nullptr),
+m_lblRxBuffer(nullptr),
+m_edRxBuff(nullptr),
+m_lblTxBuffer(nullptr),
+m_edTxBuff(nullptr),
+m_chkResetOnRxTmo(nullptr)
 {
-	wxBoxSizer* contents;
-	contents = new wxBoxSizer( wxVERTICAL );
-	
 	m_btnResetToDefaults = new wxButton( this, wxID_ANY, _("Reset to defaults"), wxDefaultPosition, wxDefaultSize, 0 );
-	contents->Add( m_btnResetToDefaults, 0, wxALL, 5 );
+	m_layContents->Add( m_btnResetToDefaults, 0, wxALL, 5 );
 	
 	m_settings = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_pnlStd = new wxPanel( m_settings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
@@ -211,62 +252,105 @@ m_intf(*this)
 	controlsAdvanced->Fit( m_pnlAdvanced );
 	m_settings->AddPage( m_pnlAdvanced, _("Advanced"), false );
 	
-	contents->Add( m_settings, 1, wxEXPAND | wxALL, 5 );
-	SetSizer( contents );
+	m_layContents->Add( m_settings, 1, wxEXPAND | wxALL, 5 );
 	Layout();	
 	
-	// enumerate ports
-	populatePorts();
 	// set-up property links
-	m_links
-		.linkAdd(EsUartIoPortPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoUart, port), m_edPortName, m_lblPort, m_ports))
-		.linkAdd(EsComboBoxPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoUart, baud), m_edBaud, m_lblBaud))
-		.linkAdd(EsComboBoxPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoUart, bits), m_edByteSize, m_lblByteSize))
-		.linkAdd(EsComboBoxPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoUart, parity), m_edParity, m_lblParity))
-		.linkAdd(EsComboBoxPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoUart, stopBits), m_edStopBits, m_lblStopBits))
-		.linkAdd(EsSpinCtlPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoUart, rxBuffLen), m_edRxBuff, m_lblRxBuffer))
-		.linkAdd(EsSpinCtlPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoUart, txBuffLen), m_edTxBuff, m_lblTxBuffer))
-		.linkAdd(EsCheckBoxPropertyLink::create(ES_REFLECTED_PROP_INFO_GET(EsChannelIoUart, resetOnRxTmo), m_chkResetOnRxTmo));
+	m_src.link(
+    EsUartIoPortPropertyLink::create(
+      *this,
+      esT("port"), 
+      m_edPortName, 
+      m_lblPort      
+    )
+  );
+	m_src.link(
+    EsComboBoxPropertyLink::create(
+      esT("baud"), 
+      m_edBaud, 
+      m_lblBaud
+    )
+  );
+	m_src.link(
+    EsComboBoxPropertyLink::create(
+      esT("bits"), 
+      m_edByteSize, 
+      m_lblByteSize
+    )
+  );
+	m_src.link(
+    EsComboBoxPropertyLink::create(
+      esT("parity"), 
+      m_edParity, 
+      m_lblParity
+    )
+  );
+	m_src.link(
+    EsComboBoxPropertyLink::create(
+      esT("stopBits"), 
+      m_edStopBits, 
+      m_lblStopBits
+    )
+  );
+	m_src.link(
+    EsSpinCtlPropertyLink::create(
+      esT("rxBuffLen"), 
+      m_edRxBuff, 
+      m_lblRxBuffer
+    )
+  );
+	m_src.link(
+    EsSpinCtlPropertyLink::create(
+      esT("txBuffLen"), 
+      m_edTxBuff, 
+      m_lblTxBuffer
+    )
+  );
+	m_src.link(
+    EsCheckBoxPropertyLink::create(
+      esT("resetOnRxTmo"), 
+      m_chkResetOnRxTmo
+    )
+  );
 
-	// adjust width to fit longest string inside port names list
-	wxSize sze = m_edPortName->GetClientSize();
-	sze.x -= wxSystemSettings::GetMetric( wxSYS_HTHUMB_X ) + 2 * wxSystemSettings::GetMetric( wxSYS_EDGE_X );
-	EsString::Array strs = EsUtilities::fromArrayString(m_edPortName->GetStrings());
-	int delta = wxMax( EsUtilities::longestStringWidthGet(strs, *m_edPortName, GetFont()), sze.x) - sze.x;
-	if( 0 < delta )
-	{
-		sze = GetClientSize();
-		sze.x += delta;
-		SetClientSize(sze);
-		Layout();
-	}
-	
 	// Connect Events
-	m_btnResetToDefaults->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoUartConfigPaneWnd::onResetToDefaults, this );
-	m_btnRescan->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoUartConfigPaneWnd::onRescan, this );
+	m_btnResetToDefaults->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoUartConfigPane::onResetToDefaults, this );
+	m_btnRescan->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoUartConfigPane::onRescan, this );
 }
+//--------------------------------------------------------------------------------
 
-// populate port selector
-void EsChannelIoUartConfigPaneWnd::populatePorts()
+EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoUartConfigPane::create(wxWindow* parent)
 {
-	m_edPortName->Clear();
-	// enumerate communication ports on this machine, ignoring busy ones
-	m_ports.enumerate(true);
-	// fill-in port selector with user-friendly port names, ignoring modems
-	for(size_t idx = 0; idx < m_ports.size(); ++idx)
-	{
-		if( !m_ports[idx].m_bModem )
-			m_edPortName->AppendString( m_ports[idx].m_strFriendlyName.c_str() );
-	}
-}
+  std::unique_ptr<EsChannelIoUartConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoUartConfigPane, parent );
+  ES_ASSERT(ptr);
 
-// reset button click handler
-void EsChannelIoUartConfigPaneWnd::onResetToDefaults(wxCommandEvent& WXUNUSED(evt))
-{
-	m_links.resetControlsToDefault();	
+  return ptr.release()->intfGet();
 }
+//--------------------------------------------------------------------------------
 
-void EsChannelIoUartConfigPaneWnd::onRescan(wxCommandEvent& WXUNUSED(evt))
+EsChannelIoUartConfigPane::~EsChannelIoUartConfigPane()
 {
-	populatePorts();
+  ES_DEBUG_TRACE(
+    esT("EsChannelIoUartConfigPane::~EsChannelIoUartConfigPane")
+  );
+
+	// Disconnect Events
+	m_btnResetToDefaults->Unbind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoUartConfigPane::onResetToDefaults, this );
+	m_btnRescan->Unbind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoUartConfigPane::onRescan, this );
 }
+//--------------------------------------------------------------------------------
+
+void EsChannelIoUartConfigPane::onResetToDefaults(wxCommandEvent& WXUNUSED(evt))
+{
+	m_src.resetControlsToDefault();	
+}
+//--------------------------------------------------------------------------------
+
+void EsChannelIoUartConfigPane::onRescan(wxCommandEvent& WXUNUSED(evt))
+{
+	EsUartIoPortPropertyLink* link = m_src.linkFind<EsUartIoPortPropertyLink>(esT("port"));
+  ES_ASSERT(link);
+
+  link->itemsPopulate();
+}
+//--------------------------------------------------------------------------------

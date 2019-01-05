@@ -32,6 +32,7 @@
 #endif
 
 #include <wx/file.h>
+#include <wx/config.h>
 #include <wx/filepicker.h>
 #include <wx/filehistory.h>
 #include <wx/wupdlock.h>

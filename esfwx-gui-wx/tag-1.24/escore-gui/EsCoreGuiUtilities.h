@@ -16,15 +16,24 @@ namespace EsUtilities
 
   /// Convert wxArrayString to EsString::Array
   ESCORE_GUI_FUNC(void, wxArrayStringToEsStringArray(EsString::Array& dest, const wxArrayString& src));
+  ESCORE_GUI_FUNC(EsString::Array, wxArrayStringToEsStringArray(const wxArrayString& src));
 
   /// Convert EsString::Array to wxArrayString
   ESCORE_GUI_FUNC(void, esStringArrayToWxArrayString(wxArrayString& dest, const EsString::Array& src));
+  ESCORE_GUI_FUNC(wxArrayString, esStringArrayToWxArrayString(const EsString::Array& src));
 
   /// Get MRU files into EsString::Array
   ESCORE_GUI_FUNC(void, mruToEsStringArray(EsString::Array& dest, const wxFileHistory& src));
 
   /// Set EsString::Array files to MRU
   ESCORE_GUI_FUNC(void, esStringArrayToMru(wxFileHistory& dest, const EsString::Array& src));
+
+  /// Datetime conversions
+  ESCORE_GUI_FUNC(wxDateTime, esDateTimeToWxDateTime(const EsDateTime& dt));
+  ESCORE_GUI_FUNC(EsDateTime, wxDateTimeToEsDateTime(const wxDateTime& dt));
+
+  /// Extract only time part from wxDateTime
+  ESCORE_GUI_FUNC(void, wxDateTimeTimeToEsDateTime(EsDateTime& dest, const wxDateTime& dt));
 
   /// Window position serialization
   ESCORE_GUI_FUNC(void, windowPosSave(const EsStreamIntf::Ptr& out, const wxPoint& pos));
@@ -99,6 +108,7 @@ namespace EsUtilities
 
   /// Get longest string width in pixels, using wnd visual settings
   ESCORE_GUI_FUNC(int, longestStringWidthGet(const EsString::Array& strings, const wxWindow& wnd, const wxFont& fnt));
+  ESCORE_GUI_FUNC(int, longestStringWidthGet(const wxArrayString& strings, const wxWindow& wnd, const wxFont& fnt));
 
   /// wxAUI Toolbar helpers
   ///
