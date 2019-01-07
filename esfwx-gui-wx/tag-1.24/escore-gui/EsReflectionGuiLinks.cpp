@@ -257,11 +257,19 @@ EsReflectedClassDataSource::~EsReflectedClassDataSource()
 {
   while(!m_links.empty())
   {
-    EsReflectedClassPropertyLinksT::iterator it = m_links.begin();
-    (*it)->sourceSet(nullptr);
+    auto it = m_links.begin();
+
+    EsReflectedClassPropertyLink::Ptr link = (*it);
+    link->sourceSet(nullptr);
   }
 }
 //---------------------------------------------------------------------------
+
+void EsReflectedClassDataSource::paneRefSet(wxWindow* ref) ES_NOTHROW
+{
+  m_ref = ref;
+}
+//--------------------------------------------------------------------------------
 
 EsMetaclassIntf::Ptr EsReflectedClassDataSource::metaGet() const ES_NOTHROW
 {
@@ -397,7 +405,6 @@ EsReflectedClassDataSource(
   meta
 )
 {
-  ES_ASSERT(meta);
 }
 //---------------------------------------------------------------------------
 
@@ -552,8 +559,10 @@ void EsComboBoxPropertyLink::itemsPopulate()
   if( wxNOT_FOUND != sel )
   {
     if( 0 != m_cbx->GetCount() )
+    {
       if( sel >= static_cast<int>(m_cbx->GetCount()) )
         sel = m_cbx->GetCount()-1;
+    }
     else
       sel = wxNOT_FOUND;
   }

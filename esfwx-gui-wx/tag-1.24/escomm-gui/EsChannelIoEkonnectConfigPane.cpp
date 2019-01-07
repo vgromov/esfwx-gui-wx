@@ -79,10 +79,10 @@ public:
 	      
         if( 0 < delta )
 	      {
-		      sze = m_pane.GetClientSize();
+		      sze = m_pane.paneGet()->GetClientSize();
 		      sze.x += delta;
-		      m_pane.SetClientSize(sze);
-		      m_pane.Layout();
+		      m_pane.paneGet()->SetClientSize(sze);
+		      m_pane.paneGet()->Layout();
 	      }
       }
       else
@@ -121,10 +121,11 @@ protected:
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
-EsChannelIoEkonnectConfigPane::EsChannelIoEkonnectConfigPane(wxWindow* parent) :
-EsReflectedClassConfigPane(
-  parent,
-  EsChannelIoEkonnect::classNameGetStatic()
+EsChannelIoEkonnectConfigPane::
+ConfigPaneWnd::ConfigPaneWnd(EsChannelIoEkonnectConfigPane& pane, wxWindow* parent) :
+PaneWnd(
+  pane,
+  parent
 ),
 m_btnResetToDefaults(nullptr),
 m_settings(nullptr),
@@ -153,7 +154,7 @@ m_chkResetOnRxTmo(nullptr),
 m_chkUseRS232(nullptr)
 {
 	m_btnResetToDefaults = new wxButton( this, wxID_ANY, _("Reset to defaults") );
-	m_layContents->Add( m_btnResetToDefaults, 0, wxALL, 5 );
+	m_layContents->Add( m_btnResetToDefaults, wxSizerFlags().Border() );
 	
 	m_settings = new wxNotebook( this, wxID_ANY );
 	m_pnlStd = new wxPanel( m_settings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
@@ -164,7 +165,10 @@ m_chkUseRS232(nullptr)
 	controlsStd->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxSizerFlags lblFlags;
-	lblFlags.Border().Align(wxALIGN_CENTER_VERTICAL|wxALIGN_LEFT);
+	lblFlags.Border().CenterVertical().Left();
+
+  wxSizerFlags edFlags(1);
+  edFlags.Border().Expand();
 
 	m_lblDevice = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString );
 	m_lblDevice->Wrap( -1 );
@@ -172,46 +176,48 @@ m_chkUseRS232(nullptr)
 	
 	wxBoxSizer* box = new wxBoxSizer(wxHORIZONTAL);
 	m_edDeviceName = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	box->Add(m_edDeviceName, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL);
+	box->Add(m_edDeviceName, edFlags);
 	box->AddSpacer(5);
+
 	m_btnRescan = new wxBitmapButton( m_pnlStd, wxID_ANY, wxBitmap(rescan_xpm, wxBITMAP_TYPE_XPM));
 	m_btnRescan->SetToolTip( _("Rescan EKONNECT devices") );
-	box->Add(m_btnRescan, 0, wxALIGN_CENTER_VERTICAL);	
-	controlsStd->Add( box, 1, wxALL|wxEXPAND, 5 );
+	box->Add(m_btnRescan, wxSizerFlags().CenterVertical());	
+	controlsStd->Add( box, edFlags );
 	
 	m_lblBaud = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString );
 	m_lblBaud->Wrap( -1 );
 	controlsStd->Add( m_lblBaud, lblFlags );
 	
 	m_edBaud = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	controlsStd->Add( m_edBaud, 1, wxALL|wxEXPAND, 5 );
+	controlsStd->Add( m_edBaud, edFlags );
 	
 	m_lblByteSize = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString );
 	m_lblByteSize->Wrap( -1 );
 	controlsStd->Add( m_lblByteSize, lblFlags );
 	
 	m_edByteSize = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	controlsStd->Add( m_edByteSize, 1, wxALL|wxEXPAND, 5 );
+	controlsStd->Add( m_edByteSize, edFlags );
 	
 	m_lblParity = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString );
 	m_lblParity->Wrap( -1 );
 	controlsStd->Add( m_lblParity, lblFlags );
 	
 	m_edParity = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	controlsStd->Add( m_edParity, 1, wxALL|wxEXPAND, 5 );
+	controlsStd->Add( m_edParity, edFlags );
 	
 	m_lblStopBits = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString );
 	m_lblStopBits->Wrap( -1 );
 	controlsStd->Add( m_lblStopBits, lblFlags );
 	
 	m_edStopBits = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	controlsStd->Add( m_edStopBits, 1, wxALL|wxEXPAND, 5 );
+	controlsStd->Add( m_edStopBits, edFlags );
 	
 	m_pnlStd->SetSizer( controlsStd );
 	m_pnlStd->Layout();
 	controlsStd->Fit( m_pnlStd );
 	m_settings->AddPage( m_pnlStd, _("Generic"), true );
 	m_pnlAdvanced = new wxPanel( m_settings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+
 	wxBoxSizer* controlsAdvanced;
 	controlsAdvanced = new wxBoxSizer( wxVERTICAL );
 	
@@ -226,159 +232,223 @@ m_chkUseRS232(nullptr)
 	ctlsGrid->Add( m_lblRxTmo, lblFlags );
 	
 	m_edRxTmo = new wxSpinCtrl( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
-	ctlsGrid->Add( m_edRxTmo, 1, wxALL|wxEXPAND, 5 );
+	ctlsGrid->Add( m_edRxTmo, edFlags );
 	
 	m_lblTxTmo = new wxStaticText( m_pnlAdvanced, wxID_ANY, wxEmptyString );
 	m_lblTxTmo->Wrap( -1 );
 	ctlsGrid->Add( m_lblTxTmo, lblFlags );
 	
 	m_edTxTmo = new wxSpinCtrl( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
-	ctlsGrid->Add( m_edTxTmo, 1, wxALL|wxEXPAND, 5 );
+	ctlsGrid->Add( m_edTxTmo, edFlags );
 	
 	m_lblRxBuffer = new wxStaticText( m_pnlAdvanced, wxID_ANY, wxEmptyString );
 	m_lblRxBuffer->Wrap( -1 );
 	ctlsGrid->Add( m_lblRxBuffer, lblFlags );
 	
 	m_edRxBuff = new wxSpinCtrl( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
-	ctlsGrid->Add( m_edRxBuff, 1, wxALL|wxEXPAND, 5 );
+	ctlsGrid->Add( m_edRxBuff, edFlags );
 	
 	m_lblTxBuffer = new wxStaticText( m_pnlAdvanced, wxID_ANY, wxEmptyString );
 	m_lblTxBuffer->Wrap( -1 );
 	ctlsGrid->Add( m_lblTxBuffer, lblFlags );
 	
 	m_edTxBuff = new wxSpinCtrl( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
-	ctlsGrid->Add( m_edTxBuff, 1, wxALL|wxEXPAND, 5 );
+	ctlsGrid->Add( m_edTxBuff, edFlags );
 	
-	controlsAdvanced->Add( ctlsGrid, 0, wxEXPAND, 5 );
+	controlsAdvanced->Add( ctlsGrid, wxSizerFlags().Border().Expand() );
 	
 	m_chkResetOnRxTmo = new wxCheckBox( m_pnlAdvanced, wxID_ANY, wxEmptyString );
-	controlsAdvanced->Add( m_chkResetOnRxTmo, 0, wxALL|wxEXPAND, 5 );
+
+  wxSizerFlags edFlagsNoProportion = edFlags;
+  edFlagsNoProportion.Proportion(0);
+
+	controlsAdvanced->Add( m_chkResetOnRxTmo, edFlagsNoProportion );
 	
 	m_chkUseRS232 = new wxCheckBox( m_pnlAdvanced, wxID_ANY, wxEmptyString );
-	controlsAdvanced->Add( m_chkUseRS232, 0, wxALL|wxEXPAND, 5 );
+	controlsAdvanced->Add( m_chkUseRS232, edFlagsNoProportion );
 	
 	m_pnlAdvanced->SetSizer( controlsAdvanced );
 	m_pnlAdvanced->Layout();
 	controlsAdvanced->Fit( m_pnlAdvanced );
 	m_settings->AddPage( m_pnlAdvanced, _("Advanced"), false );
 	
-	m_layContents->Add( m_settings, 1, wxEXPAND | wxALL, 5 );
-	Layout();
-	
+	m_layContents->Add( m_settings, edFlags );
+
+	// Connect Events
+	m_btnResetToDefaults->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &ConfigPaneWnd::onResetToDefaults, this );
+	m_btnRescan->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &ConfigPaneWnd::onRescan, this );
+}
+//--------------------------------------------------------------------------------
+
+EsChannelIoEkonnectConfigPane::
+ConfigPaneWnd::~ConfigPaneWnd()
+{
+  ES_DEBUG_TRACE(esT("EsChannelIoEkonnectConfigPane::~ConfigPaneWnd"));
+
+	// Disconnect Events
+	m_btnResetToDefaults->Unbind( 
+    wxEVT_COMMAND_BUTTON_CLICKED, 
+    &ConfigPaneWnd::onResetToDefaults, 
+    this 
+  );
+	m_btnRescan->Unbind( 
+    wxEVT_COMMAND_BUTTON_CLICKED, 
+    &ConfigPaneWnd::onRescan, 
+    this 
+  );
+}
+//--------------------------------------------------------------------------------
+
+void EsChannelIoEkonnectConfigPane::
+ConfigPaneWnd::onResetToDefaults(wxCommandEvent& WXUNUSED(evt))
+{
+	m_intf.controlsResetToDefault();
+}
+//--------------------------------------------------------------------------------
+
+void EsChannelIoEkonnectConfigPane::
+ConfigPaneWnd::onRescan(wxCommandEvent& WXUNUSED(evt))
+{
+	EsEkonnectIoDevicePropertyLink* link = m_intf.dataSourceAccess().linkFind<EsEkonnectIoDevicePropertyLink>(
+    esT("device")
+  );
+  ES_ASSERT(link);
+
+  link->itemsPopulate();
+}
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+
+EsString EsChannelIoEkonnectConfigPane::typeNameGet() const ES_NOTHROW
+{
+  return esT("EsChannelIoEkonnectConfigPane");
+}
+//--------------------------------------------------------------------------------
+
+EsReflectedClassConfigPane::PaneWnd* EsChannelIoEkonnectConfigPane::doPaneWndCreate(wxWindow* parent)
+{
+  PaneWnd* wnd = new ConfigPaneWnd(
+    *this, 
+    parent
+  );
+  ES_ASSERT(wnd);
+
+  return wnd;
+}
+//--------------------------------------------------------------------------------
+
+EsReflectedClassDataSource* EsChannelIoEkonnectConfigPane::doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta)
+{
+  ConfigPaneWnd* pane = wxDynamicCast( m_pane.get(), ConfigPaneWnd );
+  ES_ASSERT(pane);
+
+  std::unique_ptr<EsReflectedClassContainerDataSource> src = ES_MAKE_UNIQUE(
+    EsReflectedClassContainerDataSource,
+    m_pane,
+    className,
+    nullptr
+  );
+  ES_ASSERT(src);
+
 	// set-up control links
-	m_src.link(
+	src->link(
     EsEkonnectIoDevicePropertyLink::create(
       *this,
       esT("device"), 
-      m_edDeviceName, 
-      m_lblDevice
+      pane->m_edDeviceName, 
+      pane->m_lblDevice
     )
   );
-	m_src.link(
+	src->link(
     EsComboBoxPropertyLink::create(
       esT("baud"), 
-      m_edBaud, 
-      m_lblBaud
+      pane->m_edBaud, 
+      pane->m_lblBaud
     )
   );
-	m_src.link(
+	src->link(
     EsComboBoxPropertyLink::create(
       esT("bits"), 
-      m_edByteSize, 
-      m_lblByteSize
+      pane->m_edByteSize, 
+      pane->m_lblByteSize
     )
   );	
-  m_src.link(
+  src->link(
     EsComboBoxPropertyLink::create(
       esT("parity"), 
-      m_edParity, 
-      m_lblParity
+      pane->m_edParity, 
+      pane->m_lblParity
     )
   );
-	m_src.link(
+	src->link(
     EsComboBoxPropertyLink::create(
       esT("stopBits"), 
-      m_edStopBits, 
-      m_lblStopBits
+      pane->m_edStopBits, 
+      pane->m_lblStopBits
     )
   );
-	m_src.link(
+	src->link(
     EsSpinCtlPropertyLink::create(
       esT("rxTmo"), 
-      m_edRxTmo, 
-      m_lblRxTmo
+      pane->m_edRxTmo, 
+      pane->m_lblRxTmo
     )
   );
-	m_src.link(
+	src->link(
     EsSpinCtlPropertyLink::create(
       esT("txTmo"), 
-      m_edTxTmo, 
-      m_lblTxTmo
+      pane->m_edTxTmo, 
+      pane->m_lblTxTmo
     )
   );
-	m_src.link(
+	src->link(
     EsSpinCtlPropertyLink::create(
       esT("rxBuffLen"), 
-      m_edRxBuff, 
-      m_lblRxBuffer
+      pane->m_edRxBuff, 
+      pane->m_lblRxBuffer
     )
   );
-	m_src.link(
+	src->link(
     EsSpinCtlPropertyLink::create(
       esT("txBuffLen"), 
-      m_edTxBuff, 
-      m_lblTxBuffer
+      pane->m_edTxBuff, 
+      pane->m_lblTxBuffer
     )
   );
-	m_src.link(
+	src->link(
     EsCheckBoxPropertyLink::create(
       esT("resetOnRxTmo"), 
-      m_chkResetOnRxTmo
+      pane->m_chkResetOnRxTmo
     )
   );
-	m_src.link(
+	src->link(
     EsCheckBoxPropertyLink::create(
       esT("useRS232"), 
-      m_chkUseRS232
+      pane->m_chkUseRS232
     )
   );
 
-	// Connect Events
-	m_btnResetToDefaults->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoEkonnectConfigPane::onResetToDefaults, this );
-	m_btnRescan->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoEkonnectConfigPane::onRescan, this );
+  return src.release();
 }
 //--------------------------------------------------------------------------------
 
 EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoEkonnectConfigPane::create(wxWindow* parent)
 {
-  std::unique_ptr<EsChannelIoEkonnectConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoEkonnectConfigPane, parent );
+  std::unique_ptr<EsChannelIoEkonnectConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoEkonnectConfigPane );
   ES_ASSERT(ptr);
 
-  return ptr.release()->intfGet();
+  ptr->init(
+    parent,
+    EsChannelIoEkonnect::classNameGetStatic(),
+    nullptr
+  );
+
+  return ptr.release()->asBaseIntfPtr();
 }
 //--------------------------------------------------------------------------------
 
 EsChannelIoEkonnectConfigPane::~EsChannelIoEkonnectConfigPane()
 {
   ES_DEBUG_TRACE(esT("EsChannelIoEkonnectConfigPane::~EsChannelIoEkonnectConfigPane"));
-
-	// Disconnect Events
-	m_btnResetToDefaults->Unbind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoEkonnectConfigPane::onResetToDefaults, this );
-	m_btnRescan->Unbind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoEkonnectConfigPane::onRescan, this );
-}
-//--------------------------------------------------------------------------------
-
-void EsChannelIoEkonnectConfigPane::onResetToDefaults(wxCommandEvent& WXUNUSED(evt))
-{
-	m_src.resetControlsToDefault();
-}
-//--------------------------------------------------------------------------------
-
-void EsChannelIoEkonnectConfigPane::onRescan(wxCommandEvent& WXUNUSED(evt))
-{
-	EsEkonnectIoDevicePropertyLink* link = m_src.linkFind<EsEkonnectIoDevicePropertyLink>(esT("device"));
-  ES_ASSERT(link);
-
-  link->itemsPopulate();
 }
 //--------------------------------------------------------------------------------

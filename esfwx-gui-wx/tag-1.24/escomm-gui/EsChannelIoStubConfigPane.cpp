@@ -5,30 +5,68 @@
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
-EsChannelIoStubConfigPane::EsChannelIoStubConfigPane(wxWindow* parent) :
-EsReflectedClassConfigPane(
-  parent,
-  EsChannelIoStub::classNameGetStatic()
-)
+EsString EsChannelIoStubConfigPane::typeNameGet() const ES_NOTHROW
 {
-	m_layContents->Add( 
-    new wxStaticText(
-      this, 
-      wxID_ANY, 
-      _("Stub Io channel does not have any adjustable settings")
-    ),
-		wxSizerFlags(1).Align(wxALIGN_CENTER)
-  );
-	
-	Layout();	
+  return esT("EsChannelIoStubConfigPane");
 }
 //--------------------------------------------------------------------------------
 
+EsReflectedClassConfigPane::PaneWnd* EsChannelIoStubConfigPane::doPaneWndCreate(wxWindow* parent)
+{
+  PaneWnd* wnd = new PaneWnd(*this, parent);
+  ES_ASSERT(wnd);
+
+	wnd->contentsGet()->Add( 
+    new wxStaticText(
+      wnd, 
+      wxID_ANY, 
+      _("Stub Io channel does not have any adjustable settings"),
+      wxDefaultPosition,
+      wxSize(
+        300,
+        60
+      ),
+      wxALIGN_CENTRE_HORIZONTAL |
+      wxST_NO_AUTORESIZE
+    ),
+		wxSizerFlags(1).Border().Expand().FixedMinSize()
+  );
+
+  return wnd;
+}
+//--------------------------------------------------------------------------------
+
+EsReflectedClassDataSource* EsChannelIoStubConfigPane::doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& ES_UNUSED(meta))
+{
+  std::unique_ptr<EsReflectedClassContainerDataSource> src = ES_MAKE_UNIQUE(
+    EsReflectedClassContainerDataSource,
+    m_pane,
+    className,
+    nullptr
+  );
+  ES_ASSERT(src);
+
+  return src.release();
+}
+//--------------------------------------------------------------------------------
+
+EsChannelIoStubConfigPane::~EsChannelIoStubConfigPane()
+{
+  ES_DEBUG_TRACE(esT("EsChannelIoStubConfigPane::~EsChannelIoStubConfigPane"));
+}
+//--------------------------------------------------------------------------------
+  
 EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoStubConfigPane::create(wxWindow* parent)
 {
-  std::unique_ptr<EsChannelIoStubConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoStubConfigPane, parent );
+  std::unique_ptr<EsChannelIoStubConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoStubConfigPane );
   ES_ASSERT(ptr);
 
-  return ptr.release()->intfGet();
+  ptr->init(
+    parent,
+    EsChannelIoStub::classNameGetStatic(),
+    nullptr
+  );
+
+  return ptr.release()->asBaseIntfPtr();
 }
 //--------------------------------------------------------------------------------

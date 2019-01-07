@@ -5,10 +5,11 @@
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
-EsChannelIoSocketClientConfigPane::EsChannelIoSocketClientConfigPane(wxWindow* parent) :
-EsReflectedClassConfigPane(
-  parent, 
-  EsChannelIoSocketClient::classNameGetStatic() 
+EsChannelIoSocketClientConfigPane::
+ConfigPaneWnd::ConfigPaneWnd(EsChannelIoSocketClientConfigPane& pane, wxWindow* parent) :
+PaneWnd(
+  pane,
+  parent
 ),
 m_reset(nullptr),
 m_edAddr(nullptr),
@@ -21,13 +22,16 @@ m_lblTmo(nullptr)
   m_reset = new wxButton(this, wxID_ANY, _("Reset to defaults"));
   ES_ASSERT(m_reset);
 
-	m_layContents->Add(m_reset, 0, wxALL, 5);
+	m_layContents->Add(
+    m_reset, 
+    wxSizerFlags().Border()
+  );
 
 	wxFlexGridSizer* ctls = new wxFlexGridSizer(3, 2, 0, 0);
 	wxASSERT(ctls);
 	ctls->AddGrowableCol(1, 1);
 	wxSizerFlags lblFlags;
-	lblFlags.Border().Align(wxALIGN_CENTER_VERTICAL|wxALIGN_LEFT);
+	lblFlags.Border().CenterVertical().Left();
 
   m_edAddr = new wxTextCtrl(this, wxID_ANY);
   ES_ASSERT(m_edAddr);
@@ -36,7 +40,7 @@ m_lblTmo(nullptr)
   ES_ASSERT(m_lblAddr);
 
 	ctls->Add(m_lblAddr, lblFlags);
-	ctls->Add(m_edAddr, 1, wxALL|wxEXPAND, 5);
+	ctls->Add(m_edAddr, wxSizerFlags(1).Border().Expand());
 	
   m_edPort = new wxSpinCtrl(this, wxID_ANY);
   ES_ASSERT(m_edPort);
@@ -45,7 +49,7 @@ m_lblTmo(nullptr)
   ES_ASSERT(m_lblPort);
   
   ctls->Add(m_lblPort, lblFlags);
-	ctls->Add(m_edPort, 1, wxALL|wxEXPAND, 5);
+	ctls->Add(m_edPort, wxSizerFlags(1).Border().Expand());
 
   m_edTmo = new wxSpinCtrl(this, wxID_ANY);
   ES_ASSERT(m_edTmo);
@@ -54,58 +58,116 @@ m_lblTmo(nullptr)
   ES_ASSERT(m_lblTmo);
 
 	ctls->Add(m_lblTmo, lblFlags);
-	ctls->Add(m_edTmo, 1, wxALL|wxEXPAND, 5);
+	ctls->Add(m_edTmo, wxSizerFlags(1).Border().Expand());
 
-  m_layContents->Add(ctls, 1, wxALL|wxEXPAND, 0);
+  m_layContents->Add(ctls, wxSizerFlags(1).Border(wxALL, 0).Expand());
 
-	Layout();
-
-	// initialize property links
-	m_src.link(
-    EsTextCtlPropertyLink::create(
-      esT("target"), 
-      m_edAddr, 
-      m_lblAddr
-    )
+	m_reset->Bind(
+    wxEVT_COMMAND_BUTTON_CLICKED, 
+    &ConfigPaneWnd::onResetToDefaults, 
+    this
   );
-	m_src.link(
-    EsSpinCtlPropertyLink::create(
-      esT("targetPort"), 
-      m_edPort, 
-      m_lblPort
-    )
-  );
-	m_src.link(
-    EsSpinCtlPropertyLink::create(
-      esT("operationTimeout"), 
-      m_edTmo, 
-      m_lblTmo
-    )
-  );
-
-	m_reset->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoSocketClientConfigPane::onResetToDefaults, this);
 }
+//--------------------------------------------------------------------------------
+
+EsChannelIoSocketClientConfigPane::
+ConfigPaneWnd::~ConfigPaneWnd()
+{
+	m_reset->Unbind(
+    wxEVT_COMMAND_BUTTON_CLICKED, 
+    &ConfigPaneWnd::onResetToDefaults, 
+    this
+  );
+
+  ES_DEBUG_TRACE(
+    esT("EsChannelIoSocketClientConfigPane::~ConfigPaneWnd")
+  );
+}
+//--------------------------------------------------------------------------------
+
+void EsChannelIoSocketClientConfigPane::
+ConfigPaneWnd::onResetToDefaults(wxCommandEvent& evt)
+{
+	m_intf.controlsResetToDefault();
+}
+//--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
 EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoSocketClientConfigPane::create(wxWindow* parent)
 {
-  std::unique_ptr<EsChannelIoSocketClientConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoSocketClientConfigPane, parent );
+  std::unique_ptr<EsChannelIoSocketClientConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoSocketClientConfigPane );
   ES_ASSERT(ptr);
 
-  return ptr.release()->intfGet();
+  ptr->init(
+    parent,
+    EsChannelIoSocketClient::classNameGetStatic(),
+    nullptr
+  );
+
+  return ptr.release()->asBaseIntfPtr();
 }
 //--------------------------------------------------------------------------------
 
 EsChannelIoSocketClientConfigPane::~EsChannelIoSocketClientConfigPane()
 {
   ES_DEBUG_TRACE(esT("EsChannelIoSocketClientConfigPane::~EsChannelIoSocketClientConfigPane"));
-
-	m_reset->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoSocketClientConfigPane::onResetToDefaults, this);
 }
 //--------------------------------------------------------------------------------
 
-void EsChannelIoSocketClientConfigPane::onResetToDefaults(wxCommandEvent& evt)
+EsString EsChannelIoSocketClientConfigPane::typeNameGet() const ES_NOTHROW
 {
-	m_src.resetControlsToDefault();
+  return esT("EsChannelIoSocketClientConfigPane");
+}
+//--------------------------------------------------------------------------------
+
+EsReflectedClassConfigPane::PaneWnd* EsChannelIoSocketClientConfigPane::doPaneWndCreate(wxWindow* parent)
+{
+  PaneWnd* wnd = new ConfigPaneWnd(
+    *this, 
+    parent
+  );
+  ES_ASSERT(wnd);
+
+  return wnd;
+}
+//--------------------------------------------------------------------------------
+
+EsReflectedClassDataSource* EsChannelIoSocketClientConfigPane::doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta)
+{
+  ConfigPaneWnd* pane = wxDynamicCast( m_pane.get(), ConfigPaneWnd );
+  ES_ASSERT(pane);
+
+  std::unique_ptr<EsReflectedClassContainerDataSource> src = ES_MAKE_UNIQUE(
+    EsReflectedClassContainerDataSource,
+    m_pane,
+    className,
+    nullptr
+  );
+  ES_ASSERT(src);
+
+	// initialize property links
+	src->link(
+    EsTextCtlPropertyLink::create(
+      esT("target"), 
+      pane->m_edAddr, 
+      pane->m_lblAddr
+    )
+  );
+	src->link(
+    EsSpinCtlPropertyLink::create(
+      esT("targetPort"), 
+      pane->m_edPort, 
+      pane->m_lblPort
+    )
+  );
+	src->link(
+    EsSpinCtlPropertyLink::create(
+      esT("operationTimeout"), 
+      pane->m_edTmo, 
+      pane->m_lblTmo
+    )
+  );
+
+  return src.release();
 }
 //--------------------------------------------------------------------------------

@@ -83,10 +83,12 @@ typedef std::set< EsReflectedClassPropertyLink::Ptr > EsReflectedClassPropertyLi
 class ESCORE_GUI_CLASS EsReflectedClassDataSource
 {
 public:
-  EsReflectedClassDataSource(wxWindow* ref, const EsString& className, const EsMetaclassIntf::Ptr& meta = nullptr);
+  EsReflectedClassDataSource(wxWindow* ref, const EsString& className, const EsMetaclassIntf::Ptr& meta);
   virtual ~EsReflectedClassDataSource();
 
   const EsString& objectClassNameGet() const;
+
+  void paneRefSet(wxWindow* ref) ES_NOTHROW;
 
   EsMetaclassIntf::Ptr metaGet() const ES_NOTHROW;
   void metaSet(const EsMetaclassIntf::Ptr& meta);

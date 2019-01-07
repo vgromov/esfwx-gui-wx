@@ -35,7 +35,6 @@ protected:
 	wxBoxSizer* m_contents;
 	wxComboBox* m_channels;
 	
-	EsReflectedClassIntf::Ptr m_channel;
 	EsReflectedObjectConfigPaneIntf::Ptr m_paneChannel;	
 };
 

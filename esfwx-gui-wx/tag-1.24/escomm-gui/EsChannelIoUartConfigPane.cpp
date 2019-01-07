@@ -5,6 +5,8 @@
 
 // TODO: move resource to the art provider
 #include "res/rescan.xpm"
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 
 class EsUartIoPortPropertyLink : public EsComboBoxPropertyLink
 {
@@ -83,10 +85,10 @@ public:
 	      
         if( 0 < delta )
 	      {
-		      sze = m_pane.GetClientSize();
+		      sze = m_pane.paneGet()->GetClientSize();
 		      sze.x += delta;
-		      m_pane.SetClientSize(sze);
-		      m_pane.Layout();
+		      m_pane.paneGet()->SetClientSize(sze);
+		      m_pane.paneGet()->Layout();
 	      }
       }
       else
@@ -132,10 +134,11 @@ protected:
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
-EsChannelIoUartConfigPane::EsChannelIoUartConfigPane(wxWindow* parent) :
-EsReflectedClassConfigPane(
-  parent,
-  EsChannelIoEkonnect::classNameGetStatic()
+EsChannelIoUartConfigPane::
+ConfigPaneWnd::ConfigPaneWnd(EsChannelIoUartConfigPane& pane, wxWindow* parent) :
+PaneWnd(
+  pane,
+  parent
 ),
 m_btnResetToDefaults(nullptr),
 m_settings(nullptr),
@@ -159,7 +162,7 @@ m_edTxBuff(nullptr),
 m_chkResetOnRxTmo(nullptr)
 {
 	m_btnResetToDefaults = new wxButton( this, wxID_ANY, _("Reset to defaults"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_layContents->Add( m_btnResetToDefaults, 0, wxALL, 5 );
+	m_layContents->Add( m_btnResetToDefaults, wxSizerFlags().Border() );
 	
 	m_settings = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_pnlStd = new wxPanel( m_settings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
@@ -170,7 +173,10 @@ m_chkResetOnRxTmo(nullptr)
 	controlsStd->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxSizerFlags lblFlags;
-	lblFlags.Border().Align(wxALIGN_CENTER_VERTICAL|wxALIGN_LEFT);
+	lblFlags.Border().CenterVertical().Left();
+
+  wxSizerFlags edFlags(1);
+  edFlags.Border().Expand();
 
 	m_lblPort = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_lblPort->Wrap( -1 );
@@ -178,40 +184,40 @@ m_chkResetOnRxTmo(nullptr)
 	
 	wxBoxSizer* box = new wxBoxSizer(wxHORIZONTAL);
 	m_edPortName = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	box->Add(m_edPortName, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL);
+	box->Add(m_edPortName, edFlags);
 	box->AddSpacer(5);
 	m_btnRescan = new wxBitmapButton( m_pnlStd, wxID_ANY, wxBitmap(rescan_xpm, wxBITMAP_TYPE_XPM));
 	m_btnRescan->SetToolTip( _("Rescan serial ports") );
-	box->Add(m_btnRescan, 0, wxALIGN_CENTER_VERTICAL);
-	controlsStd->Add( box, 1, wxALL|wxEXPAND, 5 );
+	box->Add(m_btnRescan, wxSizerFlags().CenterVertical());
+	controlsStd->Add( box, edFlags );
 	
 	m_lblBaud = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_lblBaud->Wrap( -1 );
 	controlsStd->Add( m_lblBaud, lblFlags );
 	
 	m_edBaud = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	controlsStd->Add( m_edBaud, 1, wxALL|wxEXPAND, 5 );
+	controlsStd->Add( m_edBaud, edFlags );
 	
 	m_lblByteSize = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_lblByteSize->Wrap( -1 );
 	controlsStd->Add( m_lblByteSize, lblFlags );
 	
 	m_edByteSize = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	controlsStd->Add( m_edByteSize, 1, wxALL|wxEXPAND, 5 );
+	controlsStd->Add( m_edByteSize, edFlags );
 	
 	m_lblParity = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_lblParity->Wrap( -1 );
 	controlsStd->Add( m_lblParity, lblFlags );
 	
 	m_edParity = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	controlsStd->Add( m_edParity, 1, wxALL|wxEXPAND, 5 );
+	controlsStd->Add( m_edParity, edFlags );
 	
 	m_lblStopBits = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_lblStopBits->Wrap( -1 );
 	controlsStd->Add( m_lblStopBits, lblFlags );
 	
 	m_edStopBits = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-	controlsStd->Add( m_edStopBits, 1, wxALL|wxEXPAND, 5 );
+	controlsStd->Add( m_edStopBits, edFlags );
 	
 	m_pnlStd->SetSizer( controlsStd );
 	m_pnlStd->Layout();
@@ -232,99 +238,191 @@ m_chkResetOnRxTmo(nullptr)
 	ctlsGrid->Add( m_lblRxBuffer, lblFlags );
 	
 	m_edRxBuff = new wxSpinCtrl( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
-	ctlsGrid->Add( m_edRxBuff, 1, wxALL|wxEXPAND, 5 );
+	ctlsGrid->Add( m_edRxBuff, edFlags );
 	
 	m_lblTxBuffer = new wxStaticText( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_lblTxBuffer->Wrap( -1 );
 	ctlsGrid->Add( m_lblTxBuffer, lblFlags );
 	
 	m_edTxBuff = new wxSpinCtrl( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
-	ctlsGrid->Add( m_edTxBuff, 1, wxALL|wxEXPAND, 5 );
+	ctlsGrid->Add( m_edTxBuff, edFlags );
 	
-	controlsAdvanced->Add( ctlsGrid, 0, wxEXPAND, 5 );
+  wxSizerFlags edNoProportion = edFlags;
+  edNoProportion.Proportion(0);
+
+	controlsAdvanced->Add( ctlsGrid, edNoProportion );
 	
 	m_chkResetOnRxTmo = new wxCheckBox( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	
-	controlsAdvanced->Add( m_chkResetOnRxTmo, 0, wxALL|wxEXPAND, 5 );
+	controlsAdvanced->Add( m_chkResetOnRxTmo, edNoProportion );
 	
 	m_pnlAdvanced->SetSizer( controlsAdvanced );
 	m_pnlAdvanced->Layout();
 	controlsAdvanced->Fit( m_pnlAdvanced );
 	m_settings->AddPage( m_pnlAdvanced, _("Advanced"), false );
 	
-	m_layContents->Add( m_settings, 1, wxEXPAND | wxALL, 5 );
-	Layout();	
-	
+	m_layContents->Add( m_settings, edFlags );
+
+	// Connect Events
+	m_btnResetToDefaults->Bind( 
+    wxEVT_COMMAND_BUTTON_CLICKED, 
+    &ConfigPaneWnd::onResetToDefaults, 
+    this 
+  );
+	m_btnRescan->Bind( 
+    wxEVT_COMMAND_BUTTON_CLICKED, 
+    &ConfigPaneWnd::onRescan, 
+    this 
+  );
+}
+//--------------------------------------------------------------------------------
+
+EsChannelIoUartConfigPane::
+ConfigPaneWnd::~ConfigPaneWnd()
+{
+  ES_DEBUG_TRACE(
+    esT("EsChannelIoUartConfigPane::~ConfigPaneWnd")
+  );
+
+	// Disconnect Events
+	m_btnResetToDefaults->Unbind( 
+    wxEVT_COMMAND_BUTTON_CLICKED, 
+    &ConfigPaneWnd::onResetToDefaults, 
+    this 
+  );
+	m_btnRescan->Unbind( 
+    wxEVT_COMMAND_BUTTON_CLICKED, 
+    &ConfigPaneWnd::onRescan, 
+    this 
+  );
+}
+//--------------------------------------------------------------------------------
+
+void EsChannelIoUartConfigPane::
+ConfigPaneWnd::onResetToDefaults(wxCommandEvent& WXUNUSED(evt))
+{
+  m_intf.controlsResetToDefault();
+}
+//--------------------------------------------------------------------------------
+
+void EsChannelIoUartConfigPane::
+ConfigPaneWnd::onRescan(wxCommandEvent& WXUNUSED(evt))
+{
+	EsUartIoPortPropertyLink* link = m_intf.dataSourceAccess().linkFind<EsUartIoPortPropertyLink>(
+    esT("port")
+  );
+  ES_ASSERT(link);
+
+  link->itemsPopulate();
+}
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+
+EsString EsChannelIoUartConfigPane::typeNameGet() const ES_NOTHROW
+{
+  return esT("EsChannelIoUartConfigPane");
+}
+//--------------------------------------------------------------------------------
+
+EsReflectedClassConfigPane::PaneWnd* EsChannelIoUartConfigPane::doPaneWndCreate(wxWindow* parent)
+{
+  PaneWnd* wnd = new ConfigPaneWnd(
+    *this, 
+    parent
+  );
+  ES_ASSERT(wnd);
+
+  return wnd;
+}
+//--------------------------------------------------------------------------------
+
+EsReflectedClassDataSource* EsChannelIoUartConfigPane::doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta)
+{
+  ConfigPaneWnd* pane = wxDynamicCast( m_pane.get(), ConfigPaneWnd );
+  ES_ASSERT(pane);
+
+  std::unique_ptr<EsReflectedClassContainerDataSource> src = ES_MAKE_UNIQUE(
+    EsReflectedClassContainerDataSource,
+    m_pane,
+    className,
+    nullptr
+  );
+  ES_ASSERT(src);
+
 	// set-up property links
-	m_src.link(
+	src->link(
     EsUartIoPortPropertyLink::create(
       *this,
       esT("port"), 
-      m_edPortName, 
-      m_lblPort      
+      pane->m_edPortName, 
+      pane->m_lblPort      
     )
   );
-	m_src.link(
+	src->link(
     EsComboBoxPropertyLink::create(
       esT("baud"), 
-      m_edBaud, 
-      m_lblBaud
+      pane->m_edBaud, 
+      pane->m_lblBaud
     )
   );
-	m_src.link(
+	src->link(
     EsComboBoxPropertyLink::create(
       esT("bits"), 
-      m_edByteSize, 
-      m_lblByteSize
+      pane->m_edByteSize, 
+      pane->m_lblByteSize
     )
   );
-	m_src.link(
+	src->link(
     EsComboBoxPropertyLink::create(
       esT("parity"), 
-      m_edParity, 
-      m_lblParity
+      pane->m_edParity, 
+      pane->m_lblParity
     )
   );
-	m_src.link(
+	src->link(
     EsComboBoxPropertyLink::create(
       esT("stopBits"), 
-      m_edStopBits, 
-      m_lblStopBits
+      pane->m_edStopBits, 
+      pane->m_lblStopBits
     )
   );
-	m_src.link(
+	src->link(
     EsSpinCtlPropertyLink::create(
       esT("rxBuffLen"), 
-      m_edRxBuff, 
-      m_lblRxBuffer
+      pane->m_edRxBuff, 
+      pane->m_lblRxBuffer
     )
   );
-	m_src.link(
+	src->link(
     EsSpinCtlPropertyLink::create(
       esT("txBuffLen"), 
-      m_edTxBuff, 
-      m_lblTxBuffer
+      pane->m_edTxBuff, 
+      pane->m_lblTxBuffer
     )
   );
-	m_src.link(
+	src->link(
     EsCheckBoxPropertyLink::create(
       esT("resetOnRxTmo"), 
-      m_chkResetOnRxTmo
+      pane->m_chkResetOnRxTmo
     )
   );
 
-	// Connect Events
-	m_btnResetToDefaults->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoUartConfigPane::onResetToDefaults, this );
-	m_btnRescan->Bind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoUartConfigPane::onRescan, this );
+  return src.release();
 }
 //--------------------------------------------------------------------------------
 
 EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoUartConfigPane::create(wxWindow* parent)
 {
-  std::unique_ptr<EsChannelIoUartConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoUartConfigPane, parent );
+  std::unique_ptr<EsChannelIoUartConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoUartConfigPane );
   ES_ASSERT(ptr);
 
-  return ptr.release()->intfGet();
+  ptr->init(
+    parent,
+    EsChannelIoUart::classNameGetStatic(),
+    nullptr
+  );
+
+  return ptr.release()->asBaseIntfPtr();
 }
 //--------------------------------------------------------------------------------
 
@@ -333,24 +431,5 @@ EsChannelIoUartConfigPane::~EsChannelIoUartConfigPane()
   ES_DEBUG_TRACE(
     esT("EsChannelIoUartConfigPane::~EsChannelIoUartConfigPane")
   );
-
-	// Disconnect Events
-	m_btnResetToDefaults->Unbind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoUartConfigPane::onResetToDefaults, this );
-	m_btnRescan->Unbind( wxEVT_COMMAND_BUTTON_CLICKED, &EsChannelIoUartConfigPane::onRescan, this );
-}
-//--------------------------------------------------------------------------------
-
-void EsChannelIoUartConfigPane::onResetToDefaults(wxCommandEvent& WXUNUSED(evt))
-{
-	m_src.resetControlsToDefault();	
-}
-//--------------------------------------------------------------------------------
-
-void EsChannelIoUartConfigPane::onRescan(wxCommandEvent& WXUNUSED(evt))
-{
-	EsUartIoPortPropertyLink* link = m_src.linkFind<EsUartIoPortPropertyLink>(esT("port"));
-  ES_ASSERT(link);
-
-  link->itemsPopulate();
 }
 //--------------------------------------------------------------------------------
