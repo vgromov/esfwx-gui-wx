@@ -66,7 +66,7 @@ set(escommgui_ChannelIoStub_SRCS
   EsChannelIoStubConfigPane.cpp
   EsChannelIoStubConfigPane.h
 )
-source_group(EsChannelIoStub FILES ${escommgui_ChannelIoStub_SRCS})	
+source_group(ChannelIoStub FILES ${escommgui_ChannelIoStub_SRCS})	
 
 set(escommgui_locale_SRCS 
   locale/escomm-gui.pot

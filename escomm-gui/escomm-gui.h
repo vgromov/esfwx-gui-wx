@@ -30,11 +30,6 @@
 #	define ESCOMM_GUI_DATA(type, decl)    type decl
 #endif
 
-class EsFrmCommLog;
-class EsCommConfigPane;
-class EsProtocolConfigPane;
-class EsCommConfigDlg;
-
 #include <escomm-gui/EsChannelIoConfigPane.h>
 #include <escomm-gui/EsCommConfigDlg.h>
 #include <escomm-gui/EsChannelIoStubConfigPane.h>

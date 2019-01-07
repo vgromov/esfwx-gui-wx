@@ -5,10 +5,11 @@
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
-EsProtocolEcoeConfigPane::EsProtocolEcoeConfigPane(wxWindow* parent) : 
-EsReflectedClassConfigPane(
-  parent,
-  EsRpcMaster::classNameGetStatic()
+EsProtocolEcoeConfigPane::
+ConfigPaneWnd::ConfigPaneWnd(EsProtocolEcoeConfigPane& pane, wxWindow* parent) :
+PaneWnd(
+  pane, 
+  parent
 ),
 m_reset(nullptr),
 m_lblPacketTmo(nullptr),
@@ -105,60 +106,112 @@ m_edSlaveAddr(nullptr)
     ctls, 
     wxSizerFlags().Expand().Border(wxALL, 0)
   );
-	
-	// initialize property links
-	m_src.link(
-    EsSpinCtlPropertyLink::create(
-      esT("packetTimeout"), 
-      m_edPacketTmo, 
-      m_lblPacketTmo
-     )
-  );
-	m_src.link(
-    EsSpinCtlPropertyLink::create(
-      esT("packetRetries"), 
-      m_edPacketRetries, 
-      m_lblPacketRetries
-    )
-  );
-	m_src.link(
-    EsSpinCtlPropertyLink::create(
-      esT("clientAddr"), 
-      m_edSlaveAddr, 
-      m_lblSlaveAddr
-    )
-  );
 
 	// connect events
 	m_reset->Bind(
     wxEVT_COMMAND_BUTTON_CLICKED, 
-    &EsProtocolEcoeConfigPane::onResetToDefaults, 
+    &ConfigPaneWnd::onResetToDefaults, 
     this
   );
+}
+//--------------------------------------------------------------------------------
+
+EsProtocolEcoeConfigPane::
+ConfigPaneWnd::~ConfigPaneWnd()
+{
+  ES_DEBUG_TRACE(esT("EsProtocolEcoeConfigPane::~ConfigPaneWnd"));
+
+	m_reset->Unbind(
+    wxEVT_COMMAND_BUTTON_CLICKED, 
+    &ConfigPaneWnd::onResetToDefaults, 
+    this
+  );
+}
+//--------------------------------------------------------------------------------
+
+void EsProtocolEcoeConfigPane::
+ConfigPaneWnd::onResetToDefaults(wxCommandEvent& WXUNUSED(evt))
+{
+  if( !m_orphan )
+    m_intf.dataSourceAccess().resetControlsToDefault();
+}
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+
+EsProtocolEcoeConfigPane::~EsProtocolEcoeConfigPane()
+{
+  ES_DEBUG_TRACE(
+    esT("EsProtocolEcoeConfigPane::~EsProtocolEcoeConfigPane")
+  );
+}
+//--------------------------------------------------------------------------------
+
+EsString EsProtocolEcoeConfigPane::typeNameGet() const ES_NOTHROW
+{
+  return esT("EsProtocolEcoeConfigPane");
+}
+//--------------------------------------------------------------------------------
+
+EsReflectedClassConfigPane::PaneWnd* EsProtocolEcoeConfigPane::doPaneWndCreate(wxWindow* parent)
+{
+  ConfigPaneWnd* wnd = new ConfigPaneWnd(*this, parent);
+  ES_ASSERT(wnd);
+
+  return wnd;
+}
+//--------------------------------------------------------------------------------
+
+EsReflectedClassDataSource* EsProtocolEcoeConfigPane::doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& ES_UNUSED(meta))
+{
+  ConfigPaneWnd* pane = wxDynamicCast( m_pane.get(), ConfigPaneWnd );
+  ES_ASSERT(pane);
+
+  std::unique_ptr<EsReflectedClassContainerDataSource> src = ES_MAKE_UNIQUE(
+    EsReflectedClassContainerDataSource,
+    m_pane,
+    className,
+    nullptr
+  );
+  ES_ASSERT(src);
+
+	// initialize property links
+	src->link(
+    EsSpinCtlPropertyLink::create(
+      esT("packetTimeout"), 
+      pane->m_edPacketTmo, 
+      pane->m_lblPacketTmo
+     )
+  );
+	src->link(
+    EsSpinCtlPropertyLink::create(
+      esT("packetRetries"), 
+      pane->m_edPacketRetries, 
+      pane->m_lblPacketRetries
+    )
+  );
+	src->link(
+    EsSpinCtlPropertyLink::create(
+      esT("clientAddr"), 
+      pane->m_edSlaveAddr, 
+      pane->m_lblSlaveAddr
+    )
+  );
+
+  return src.release();
 }
 //--------------------------------------------------------------------------------
 
 EsReflectedObjectConfigPaneIntf::Ptr EsProtocolEcoeConfigPane::create(wxWindow* parent)
 {
-  std::unique_ptr<EsProtocolEcoeConfigPane> ptr = ES_MAKE_UNIQUE( EsProtocolEcoeConfigPane, parent );
+  std::unique_ptr<EsProtocolEcoeConfigPane> ptr = ES_MAKE_UNIQUE( EsProtocolEcoeConfigPane );
   ES_ASSERT(ptr);
 
-  return ptr.release()->intfGet();
-}
-//--------------------------------------------------------------------------------
-
-EsProtocolEcoeConfigPane::~EsProtocolEcoeConfigPane()
-{
-	m_reset->Unbind(
-    wxEVT_COMMAND_BUTTON_CLICKED, 
-    &EsProtocolEcoeConfigPane::onResetToDefaults, 
-    this
+  ptr->init(
+    parent,
+    EsRpcMaster::classNameGetStatic(),
+    nullptr
   );
-}
-//--------------------------------------------------------------------------------
 
-void EsProtocolEcoeConfigPane::onResetToDefaults(wxCommandEvent& WXUNUSED(evt))
-{
-	m_src.resetControlsToDefault();
+  return ptr.release()->asBaseIntfPtr();
 }
 //--------------------------------------------------------------------------------
