@@ -15,6 +15,8 @@ m_orphan(false)
   m_layContents = new wxFlexGridSizer(1); //< Start with single column layout
   ES_ASSERT(m_layContents);
 
+  m_layContents->AddGrowableCol(0, 1);
+
   SetSizer(
     m_layContents
   );
@@ -60,17 +62,19 @@ m_applyingFromObject(false)
 }
 //---------------------------------------------------------------------------
 
-EsReflectedClassConfigPane::~EsReflectedClassConfigPane()
+EsReflectedClassConfigPane::~EsReflectedClassConfigPane() ES_NOTHROW
 {
+  ES_DEBUG_TRACE(esT("EsReflectedClassConfigPane::~EsReflectedClassConfigPane"));
+
   m_src.reset();
 
   if( !m_pane )
     return;
 
-  m_pane->m_orphan = true; //< Signal we're no longer exist
+  m_pane->m_orphan = true;    //< Signal we're no longer exist
   m_pane->Hide();
   m_pane->SetParent(nullptr);
-  m_pane->Close(true); //< Calling proper delayed destruction
+  m_pane->Destroy();          //< Safely (delayed) destruction
 }
 //--------------------------------------------------------------------------------
 

@@ -11,8 +11,6 @@ ES_DECL_INTF_BEGIN(8CC19CF9, D0B24b4c, 8D361982, 26E276BA, EsReflectedObjectConf
   ES_DECL_INTF_METHOD(EsReflectedClassDataSource&, dataSourceAccess)() ES_NOTHROW = 0;
   /// Access pane's self window
   ES_DECL_INTF_METHOD(wxWindow*, paneGet)() ES_NOTHROW = 0;
-  /// Access pane owner (parent)
-  ES_DECL_INTF_METHOD(wxWindow*, parentGet)() const ES_NOTHROW = 0;
   /// Access pane contents
   ES_DECL_INTF_METHOD(wxSizer*, contentsGet)() const ES_NOTHROW = 0;
   /// Update pane controls from linked Reflected object source
@@ -75,7 +73,7 @@ protected:
   EsReflectedClassConfigPane();
 
 public:
-  virtual ~EsReflectedClassConfigPane();
+  virtual ~EsReflectedClassConfigPane() ES_NOTHROW;
 
   /// EsReflectedObjectConfigPaneIntf implementation
   ///
@@ -89,9 +87,6 @@ public:
   /// Access underlying reflected data source
   ES_DECL_INTF_METHOD(EsReflectedClassDataSource&, dataSourceAccess)() ES_NOTHROW ES_OVERRIDE { ES_ASSERT(m_src); return *m_src.get(); }
     
-  /// Access pane parent
-  ES_DECL_INTF_METHOD(wxWindow*, parentGet)() const ES_NOTHROW ES_OVERRIDE { if(m_pane) return m_pane->GetParent(); return nullptr; }
-
   /// Access pane contents
   ES_DECL_INTF_METHOD(wxSizer*, contentsGet)() const ES_NOTHROW ES_OVERRIDE { if(m_pane) return m_pane->contentsGet(); return nullptr; }
 

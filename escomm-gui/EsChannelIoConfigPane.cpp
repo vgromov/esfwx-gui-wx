@@ -84,14 +84,11 @@ m_channels(nullptr)
 
 EsChannelIoConfigPane::~EsChannelIoConfigPane()
 {
-	if( m_cfg && m_paneChannel )
-	{
-    EsReflectedClassContainerDataSource& dsrc = dynamic_cast<EsReflectedClassContainerDataSource&>( 
-      m_paneChannel->dataSourceAccess() 
-    );
-		//EsStreamIntf::Ptr stream = EsStreamConfig::create(*m_cfg, m_path, EsStream::flagWrite);
-		//stream->objectWrite(m_channel);
-	}
+  ES_DEBUG_TRACE(esT("EsChannelIoConfigPane::~EsChannelIoConfigPane"));
+
+  currentPaneReset(
+    EsString::null()
+  );
 
 	// disconnect Events
 	m_channels->Unbind( 
@@ -137,7 +134,7 @@ void EsChannelIoConfigPane::currentPaneReset(const EsString& chnlTypeName)
       chnl = dsrc.objectGet();
 
 		// destroy active pane
-		wxWindow* wnd = m_paneChannel->paneGet();
+		wxWeakRef<wxWindow> wnd = m_paneChannel->paneGet();
 		if(wnd)
 			m_contents->Detach(wnd);
 		
