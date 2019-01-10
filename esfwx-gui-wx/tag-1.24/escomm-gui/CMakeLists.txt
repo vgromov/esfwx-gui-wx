@@ -103,7 +103,7 @@ set(targetName "escommguiLib${staticMarker}")
 set(${targetName} escommgui_${ESGUI_COMM_VERSION_SUFFIX}_${ESCOMMON_BIN_SUFFIX}${ESCOMMON_COMPILER_VERSION}${staticMarker} CACHE INTERNAL "" FORCE)
 
 ES_SPECIFY_PRECOMPILED_HEADER("escomm_gui_pch.h" "escomm_gui.cpp" escommgui_SRCS)
-ES_SPECIFY_HEADER_FILES(escommgui_SRCS headerExtensions)
+ES_SPECIFY_HEADER_FILES(escommgui_SRCS ${ES_HEADER_EXTENSIONS})
 
 add_library(
   ${${targetName}} 
