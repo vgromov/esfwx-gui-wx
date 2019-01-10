@@ -185,11 +185,13 @@ m_chkResetOnRxTmo(nullptr)
 	wxBoxSizer* box = new wxBoxSizer(wxHORIZONTAL);
 	m_edPortName = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
 	box->Add(m_edPortName, edFlags);
-	box->AddSpacer(5);
+	box->AddSpacer(edFlags.GetBorderInPixels());
 	m_btnRescan = new wxBitmapButton( m_pnlStd, wxID_ANY, wxBitmap(rescan_xpm, wxBITMAP_TYPE_XPM));
 	m_btnRescan->SetToolTip( _("Rescan serial ports") );
 	box->Add(m_btnRescan, wxSizerFlags().CenterVertical());
-	controlsStd->Add( box, edFlags );
+	box->AddSpacer(edFlags.GetBorderInPixels());
+
+	controlsStd->Add( box, wxSizerFlags().Border(wxALL, 0).Expand() );
 	
 	m_lblBaud = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_lblBaud->Wrap( -1 );
@@ -223,6 +225,7 @@ m_chkResetOnRxTmo(nullptr)
 	m_pnlStd->Layout();
 	controlsStd->Fit( m_pnlStd );
 	m_settings->AddPage( m_pnlStd, _("Generic"), true );
+
 	m_pnlAdvanced = new wxPanel( m_settings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* controlsAdvanced;
 	controlsAdvanced = new wxBoxSizer( wxVERTICAL );
@@ -247,14 +250,11 @@ m_chkResetOnRxTmo(nullptr)
 	m_edTxBuff = new wxSpinCtrl( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
 	ctlsGrid->Add( m_edTxBuff, edFlags );
 	
-  wxSizerFlags edNoProportion = edFlags;
-  edNoProportion.Proportion(0);
-
-	controlsAdvanced->Add( ctlsGrid, edNoProportion );
+	controlsAdvanced->Add( ctlsGrid, wxSizerFlags().Border(wxALL, 0).Expand() );
 	
-	m_chkResetOnRxTmo = new wxCheckBox( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_chkResetOnRxTmo = new wxCheckBox( m_pnlAdvanced, wxID_ANY, wxEmptyString );
 	
-	controlsAdvanced->Add( m_chkResetOnRxTmo, edNoProportion );
+	controlsAdvanced->Add( m_chkResetOnRxTmo, edFlags.Proportion(0) );
 	
 	m_pnlAdvanced->SetSizer( controlsAdvanced );
 	m_pnlAdvanced->Layout();
