@@ -134,12 +134,8 @@ void EsChannelIoConfigPane::currentPaneReset(const EsString& chnlTypeName)
       chnl = dsrc.objectGet();
 
 		// destroy active pane
-		wxWeakRef<wxWindow> wnd = m_paneChannel->paneGet();
-		if(wnd)
-			m_contents->Detach(wnd);
-		
 		m_paneChannel.reset();
-    
+
     // Save settings of existing channel to the configuration stream
 		if( 
       m_cfg && 
