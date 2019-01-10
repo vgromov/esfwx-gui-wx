@@ -71,10 +71,8 @@ EsReflectedClassConfigPane::~EsReflectedClassConfigPane() ES_NOTHROW
   if( !m_pane )
     return;
 
-  m_pane->m_orphan = true;    //< Signal we're no longer exist
-  m_pane->Hide();
-  m_pane->SetParent(nullptr);
-  m_pane->Destroy();          //< Safely (delayed) destruction
+  m_pane->m_orphan = true;    //< Signal we're (referenced pane interface impl. object) no longer exist
+  m_pane->Destroy();          //< Safely (delayed) destruction && cleanup
 }
 //--------------------------------------------------------------------------------
 
