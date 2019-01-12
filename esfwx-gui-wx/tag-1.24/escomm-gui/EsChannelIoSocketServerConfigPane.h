@@ -1,8 +1,10 @@
 #ifndef _Socket_Server_Io_Channel_Config_Pane_h_
 #define _Socket_Server_Io_Channel_Config_Pane_h_
 
-class EsChannelIoSocketServerConfigPane : public  EsReflectedClassConfigPane
-{
+#ifdef ES_COMM_USE_CHANNEL_IO_SOCKET
+
+class ESCOMM_GUI_CLASS ES_INTF_IMPL_DERIVED(EsChannelIoSocketServerConfigPane, EsReflectedClassConfigPane)
+
 protected:
   class ConfigPaneWnd : public PaneWnd
   {
@@ -40,6 +42,9 @@ protected:
   /// Base class implementations
   virtual PaneWnd* doPaneWndCreate(wxWindow* parent) ES_OVERRIDE;
   virtual EsReflectedClassDataSource* doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta) ES_OVERRIDE;
-};
 
-#endif // _Socket_Server_Io_Channel_Config_Pane_h_
+ES_INTF_IMPL_END
+
+#endif //< ES_COMM_USE_CHANNEL_IO_SOCKET
+
+#endif //< _Socket_Server_Io_Channel_Config_Pane_h_

@@ -1,6 +1,8 @@
 #ifndef _es_protocol_ecoe_config_pane_h_
 #define _es_protocol_ecoe_config_pane_h_
 
+#ifdef ES_COMM_USE_RPC
+
 /// ECO-E Protocol parameters configuration GUI
 ///
 class ESCOMM_GUI_CLASS EsProtocolEcoeConfigPane : public EsReflectedClassConfigPane
@@ -45,4 +47,6 @@ protected:
   virtual EsReflectedClassDataSource* doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta) ES_OVERRIDE;
 };
 
-#endif // _es_protocol_ecoe_config_pane_h_
+#endif //< ES_COMM_USE_RPC
+
+#endif //< _es_protocol_ecoe_config_pane_h_

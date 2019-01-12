@@ -37,6 +37,8 @@
 #include <escomm-gui/EsChannelIoEkonnectConfigPane.h>
 #include <escomm-gui/EsChannelIoSocketClientConfigPane.h>
 #include <escomm-gui/EsChannelIoSocketServerConfigPane.h>
+#include <escomm-gui/EsChannelIoBluetoothClientConfigPane.h>
+#include <escomm-gui/EsChannelIoBluetoothLeConfigPane.h>
 #include <escomm-gui/EsProtocolEcoeConfigPane.h>
 #include <escomm-gui/EsIoConfigPaneFactory.h>
 

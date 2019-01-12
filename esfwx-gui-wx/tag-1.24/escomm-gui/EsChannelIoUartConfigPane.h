@@ -1,8 +1,10 @@
 #ifndef _uart_io_channel_config_pane_h_
 #define _uart_io_channel_config_pane_h_
 
-class EsChannelIoUartConfigPane : public EsReflectedClassConfigPane
-{
+#ifdef ES_COMM_USE_CHANNEL_UART
+
+class ESCOMM_GUI_CLASS ES_INTF_IMPL_DERIVED(EsChannelIoUartConfigPane, EsReflectedClassConfigPane)
+
 protected:
   class ConfigPaneWnd : public PaneWnd
   {
@@ -55,6 +57,9 @@ protected:
   /// Base class implementations
   virtual PaneWnd* doPaneWndCreate(wxWindow* parent) ES_OVERRIDE;
   virtual EsReflectedClassDataSource* doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta) ES_OVERRIDE;
-};
 
-#endif // _uart_io_channel_config_pane_h_
+ES_INTF_IMPL_END
+
+#endif //< ES_COMM_USE_CHANNEL_UART
+
+#endif //< _uart_io_channel_config_pane_h_

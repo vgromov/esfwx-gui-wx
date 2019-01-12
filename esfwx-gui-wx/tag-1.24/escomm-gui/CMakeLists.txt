@@ -56,6 +56,14 @@ set(escommgui_ChannelIoSocket_SRCS
 )
 source_group(ChannelIoSocket FILES ${escommgui_ChannelIoSocket_SRCS})
 
+set(escommgui_ChannelIoBluetooth_SRCS
+  EsChannelIoBluetoothClientConfigPane.cpp
+  EsChannelIoBluetoothClientConfigPane.h
+  EsChannelIoBluetoothLeConfigPane.cpp
+  EsChannelIoBluetoothLeConfigPane.h
+)
+source_group(ChannelIoBluetooth FILES ${escommgui_ChannelIoBluetooth_SRCS})
+
 set(escommgui_ChannelIoUart_SRCS						
   EsChannelIoUartConfigPane.cpp
   EsChannelIoUartConfigPane.h
@@ -81,6 +89,7 @@ set(escommgui_SRCS
   ${escommgui_ChannelIoUart_SRCS}
   ${escommgui_ChannelIoEkonnect_SRCS}
   ${escommgui_ChannelIoSocket_SRCS}
+  ${escommgui_ChannelIoBluetooth_SRCS}
   ${escommgui_locale_SRCS}
 )					
 						

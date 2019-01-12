@@ -3,6 +3,8 @@
 
 #include "EsProtocolEcoeConfigPane.h"
 //--------------------------------------------------------------------------------
+
+#ifdef ES_COMM_USE_RPC
 //--------------------------------------------------------------------------------
 
 EsProtocolEcoeConfigPane::
@@ -148,7 +150,7 @@ EsProtocolEcoeConfigPane::~EsProtocolEcoeConfigPane()
 
 EsString EsProtocolEcoeConfigPane::typeNameGet() const ES_NOTHROW
 {
-  return esT("EsProtocolEcoeConfigPane");
+  return classNameGetStatic();
 }
 //--------------------------------------------------------------------------------
 
@@ -215,3 +217,5 @@ EsReflectedObjectConfigPaneIntf::Ptr EsProtocolEcoeConfigPane::create(wxWindow* 
   return ptr.release()->asBaseIntfPtr();
 }
 //--------------------------------------------------------------------------------
+
+#endif //< ES_COMM_USE_RPC

@@ -1,8 +1,10 @@
 #ifndef _ekonnect_io_channel_config_pane_h_
 #define _ekonnect_io_channel_config_pane_h_
 
-class EsChannelIoEkonnectConfigPane : public EsReflectedClassConfigPane
-{
+#ifdef ES_COMM_USE_CHANNEL_EKONNECT
+
+class ESCOMM_GUI_CLASS ES_INTF_IMPL_DERIVED(EsChannelIoEkonnectConfigPane, EsReflectedClassConfigPane)
+
 protected:
   class ConfigPaneWnd : public PaneWnd
   {
@@ -61,6 +63,9 @@ protected:
   /// Base class implementations
   virtual PaneWnd* doPaneWndCreate(wxWindow* parent) ES_OVERRIDE;
   virtual EsReflectedClassDataSource* doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta) ES_OVERRIDE;
-};
 
-#endif // _ekonnect_io_channel_config_pane_h_
+ES_INTF_IMPL_END
+
+#endif //< ES_COMM_USE_CHANNEL_EKONNECT
+
+#endif //< _ekonnect_io_channel_config_pane_h_
