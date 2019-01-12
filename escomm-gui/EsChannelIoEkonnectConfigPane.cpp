@@ -3,6 +3,9 @@
 
 #include "EsChannelIoEkonnectConfigPane.h"
 
+#ifdef ES_COMM_USE_CHANNEL_EKONNECT
+//--------------------------------------------------------------------------------
+
 // Resources TODO: move to the application art provider
 #include "res/rescan.xpm"
 //--------------------------------------------------------------------------------
@@ -177,12 +180,13 @@ m_chkUseRS232(nullptr)
 	wxBoxSizer* box = new wxBoxSizer(wxHORIZONTAL);
 	m_edDeviceName = new wxComboBox( m_pnlStd, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
 	box->Add(m_edDeviceName, edFlags);
-	box->AddSpacer(5);
+	box->AddSpacer(edFlags.GetBorderInPixels());
 
 	m_btnRescan = new wxBitmapButton( m_pnlStd, wxID_ANY, wxBitmap(rescan_xpm, wxBITMAP_TYPE_XPM));
 	m_btnRescan->SetToolTip( _("Rescan EKONNECT devices") );
 	box->Add(m_btnRescan, wxSizerFlags().CenterVertical());	
-	controlsStd->Add( box, edFlags );
+	box->AddSpacer(edFlags.GetBorderInPixels());
+	controlsStd->Add( box, wxSizerFlags(1).Border(wxALL, 0).Expand() );
 	
 	m_lblBaud = new wxStaticText( m_pnlStd, wxID_ANY, wxEmptyString );
 	m_lblBaud->Wrap( -1 );
@@ -255,7 +259,7 @@ m_chkUseRS232(nullptr)
 	m_edTxBuff = new wxSpinCtrl( m_pnlAdvanced, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
 	ctlsGrid->Add( m_edTxBuff, edFlags );
 	
-	controlsAdvanced->Add( ctlsGrid, wxSizerFlags().Border().Expand() );
+	controlsAdvanced->Add( ctlsGrid, wxSizerFlags().Border(wxALL, 0).Expand() );
 	
 	m_chkResetOnRxTmo = new wxCheckBox( m_pnlAdvanced, wxID_ANY, wxEmptyString );
 
@@ -321,7 +325,7 @@ ConfigPaneWnd::onRescan(wxCommandEvent& WXUNUSED(evt))
 
 EsString EsChannelIoEkonnectConfigPane::typeNameGet() const ES_NOTHROW
 {
-  return esT("EsChannelIoEkonnectConfigPane");
+  return classNameGetStatic();
 }
 //--------------------------------------------------------------------------------
 
@@ -452,3 +456,5 @@ EsChannelIoEkonnectConfigPane::~EsChannelIoEkonnectConfigPane()
   ES_DEBUG_TRACE(esT("EsChannelIoEkonnectConfigPane::~EsChannelIoEkonnectConfigPane"));
 }
 //--------------------------------------------------------------------------------
+
+#endif //< ES_COMM_USE_CHANNEL_EKONNECT

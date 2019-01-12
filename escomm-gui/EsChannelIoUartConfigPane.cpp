@@ -3,6 +3,8 @@
 
 #include "EsChannelIoUartConfigPane.h"
 
+#ifdef ES_COMM_USE_CHANNEL_UART
+
 // TODO: move resource to the art provider
 #include "res/rescan.xpm"
 //--------------------------------------------------------------------------------
@@ -320,7 +322,7 @@ ConfigPaneWnd::onRescan(wxCommandEvent& WXUNUSED(evt))
 
 EsString EsChannelIoUartConfigPane::typeNameGet() const ES_NOTHROW
 {
-  return esT("EsChannelIoUartConfigPane");
+  return classNameGetStatic();
 }
 //--------------------------------------------------------------------------------
 
@@ -433,3 +435,5 @@ EsChannelIoUartConfigPane::~EsChannelIoUartConfigPane()
   );
 }
 //--------------------------------------------------------------------------------
+
+#endif //< ES_COMM_USE_CHANNEL_UART

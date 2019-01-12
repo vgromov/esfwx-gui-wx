@@ -1,7 +1,9 @@
 #ifndef _stub_io_channel_config_pane_h_
 #define _stub_io_channel_config_pane_h_
 
-class ES_INTF_IMPL_DERIVED( EsChannelIoStubConfigPane, EsReflectedClassConfigPane )
+#ifdef ES_COMM_USE_CHANNEL_STUB
+
+class ESCOMM_GUI_CLASS ES_INTF_IMPL_DERIVED( EsChannelIoStubConfigPane, EsReflectedClassConfigPane )
 
 public:
   virtual ~EsChannelIoStubConfigPane();
@@ -18,4 +20,6 @@ protected:
 
 ES_INTF_IMPL_END
 
-#endif // _stub_io_channel_config_pane_h_
+#endif //< ES_COMM_USE_CHANNEL_STUB
+
+#endif //< _stub_io_channel_config_pane_h_

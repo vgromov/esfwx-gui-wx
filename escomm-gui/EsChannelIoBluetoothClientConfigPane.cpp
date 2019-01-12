@@ -1,14 +1,14 @@
 #include "escomm_gui_pch.h"
 #pragma hdrstop
 
-#include "EsChannelIoSocketClientConfigPane.h"
+#include "EsChannelIoBluetoothClientConfigPane.h"
 //--------------------------------------------------------------------------------
 
-#ifdef ES_COMM_USE_CHANNEL_IO_SOCKET
+#ifdef ES_COMM_USE_CHANNEL_BLUETOOTH
 //--------------------------------------------------------------------------------
 
-EsChannelIoSocketClientConfigPane::
-ConfigPaneWnd::ConfigPaneWnd(EsChannelIoSocketClientConfigPane& pane, wxWindow* parent) :
+EsChannelIoBluetoothClientConfigPane::
+ConfigPaneWnd::ConfigPaneWnd(EsChannelIoBluetoothClientConfigPane& pane, wxWindow* parent) :
 PaneWnd(
   pane,
   parent
@@ -16,10 +16,12 @@ PaneWnd(
 m_reset(nullptr),
 m_edAddr(nullptr),
 m_lblAddr(nullptr),
-m_edPort(nullptr),
-m_lblPort(nullptr),
-m_edTmo(nullptr),
-m_lblTmo(nullptr)
+m_edName(nullptr),
+m_lblName(nullptr),
+m_edSvcClass(nullptr),
+m_lblSvcClass(nullptr),
+m_edSvcName(nullptr),
+m_lblSvcName(nullptr)
 {
   m_reset = new wxButton(this, wxID_ANY, _("Reset to defaults"));
   ES_ASSERT(m_reset);
@@ -44,23 +46,32 @@ m_lblTmo(nullptr)
 	ctls->Add(m_lblAddr, lblFlags);
 	ctls->Add(m_edAddr, wxSizerFlags(1).Border().Expand());
 	
-  m_edPort = new wxSpinCtrl(this, wxID_ANY);
-  ES_ASSERT(m_edPort);
+  m_edName = new wxTextCtrl(this, wxID_ANY);
+  ES_ASSERT(m_edName);
 
-  m_lblPort = new wxStaticText(this, wxID_ANY, wxEmptyString);
-  ES_ASSERT(m_lblPort);
+  m_lblName = new wxStaticText(this, wxID_ANY, wxEmptyString);
+  ES_ASSERT(m_lblName);
   
-  ctls->Add(m_lblPort, lblFlags);
-	ctls->Add(m_edPort, wxSizerFlags(1).Border().Expand());
+  ctls->Add(m_lblName, lblFlags);
+	ctls->Add(m_edName, wxSizerFlags(1).Border().Expand());
 
-  m_edTmo = new wxSpinCtrl(this, wxID_ANY);
-  ES_ASSERT(m_edTmo);
+  m_edSvcClass = new wxTextCtrl(this, wxID_ANY);
+  ES_ASSERT(m_edSvcClass);
 
-  m_lblTmo = new wxStaticText(this, wxID_ANY, wxEmptyString);
-  ES_ASSERT(m_lblTmo);
+  m_lblSvcClass = new wxStaticText(this, wxID_ANY, wxEmptyString);
+  ES_ASSERT(m_lblSvcClass);
 
-	ctls->Add(m_lblTmo, lblFlags);
-	ctls->Add(m_edTmo, wxSizerFlags(1).Border().Expand());
+	ctls->Add(m_lblSvcClass, lblFlags);
+	ctls->Add(m_edSvcClass, wxSizerFlags(1).Border().Expand());
+
+  m_edSvcName = new wxTextCtrl(this, wxID_ANY);
+  ES_ASSERT(m_edSvcName);
+
+  m_lblSvcName = new wxStaticText(this, wxID_ANY, wxEmptyString);
+  ES_ASSERT(m_lblSvcName);
+
+	ctls->Add(m_lblSvcName, lblFlags);
+	ctls->Add(m_edSvcName, wxSizerFlags(1).Border().Expand());
 
   m_layContents->Add(ctls, wxSizerFlags(1).Border(wxALL, 0).Expand());
 
@@ -72,7 +83,7 @@ m_lblTmo(nullptr)
 }
 //--------------------------------------------------------------------------------
 
-EsChannelIoSocketClientConfigPane::
+EsChannelIoBluetoothClientConfigPane::
 ConfigPaneWnd::~ConfigPaneWnd()
 {
 	m_reset->Unbind(
@@ -82,12 +93,12 @@ ConfigPaneWnd::~ConfigPaneWnd()
   );
 
   ES_DEBUG_TRACE(
-    esT("EsChannelIoSocketClientConfigPane::~ConfigPaneWnd")
+    esT("EsChannelIoBluetoothClientConfigPane::~ConfigPaneWnd")
   );
 }
 //--------------------------------------------------------------------------------
 
-void EsChannelIoSocketClientConfigPane::
+void EsChannelIoBluetoothClientConfigPane::
 ConfigPaneWnd::onResetToDefaults(wxCommandEvent& evt)
 {
 	m_intf.controlsResetToDefault();
@@ -95,14 +106,14 @@ ConfigPaneWnd::onResetToDefaults(wxCommandEvent& evt)
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
-EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoSocketClientConfigPane::create(wxWindow* parent)
+EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoBluetoothClientConfigPane::create(wxWindow* parent)
 {
-  std::unique_ptr<EsChannelIoSocketClientConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoSocketClientConfigPane );
+  std::unique_ptr<EsChannelIoBluetoothClientConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoBluetoothClientConfigPane );
   ES_ASSERT(ptr);
 
   ptr->init(
     parent,
-    EsChannelIoSocketClient::classNameGetStatic(),
+    EsChannelIoBluetoothClient::classNameGetStatic(),
     nullptr
   );
 
@@ -110,19 +121,19 @@ EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoSocketClientConfigPane::create(w
 }
 //--------------------------------------------------------------------------------
 
-EsChannelIoSocketClientConfigPane::~EsChannelIoSocketClientConfigPane()
+EsChannelIoBluetoothClientConfigPane::~EsChannelIoBluetoothClientConfigPane()
 {
-  ES_DEBUG_TRACE(esT("EsChannelIoSocketClientConfigPane::~EsChannelIoSocketClientConfigPane"));
+  ES_DEBUG_TRACE(esT("EsChannelIoBluetoothClientConfigPane::~EsChannelIoBluetoothClientConfigPane"));
 }
 //--------------------------------------------------------------------------------
 
-EsString EsChannelIoSocketClientConfigPane::typeNameGet() const ES_NOTHROW
+EsString EsChannelIoBluetoothClientConfigPane::typeNameGet() const ES_NOTHROW
 {
   return classNameGetStatic();
 }
 //--------------------------------------------------------------------------------
 
-EsReflectedClassConfigPane::PaneWnd* EsChannelIoSocketClientConfigPane::doPaneWndCreate(wxWindow* parent)
+EsReflectedClassConfigPane::PaneWnd* EsChannelIoBluetoothClientConfigPane::doPaneWndCreate(wxWindow* parent)
 {
   PaneWnd* wnd = new ConfigPaneWnd(
     *this, 
@@ -134,7 +145,7 @@ EsReflectedClassConfigPane::PaneWnd* EsChannelIoSocketClientConfigPane::doPaneWn
 }
 //--------------------------------------------------------------------------------
 
-EsReflectedClassDataSource* EsChannelIoSocketClientConfigPane::doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta)
+EsReflectedClassDataSource* EsChannelIoBluetoothClientConfigPane::doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta)
 {
   ConfigPaneWnd* pane = wxDynamicCast( m_pane.get(), ConfigPaneWnd );
   ES_ASSERT(pane);
@@ -150,23 +161,30 @@ EsReflectedClassDataSource* EsChannelIoSocketClientConfigPane::doDataSourceCreat
 	// initialize property links
 	src->link(
     EsTextCtlPropertyLink::create(
-      esT("target"), 
+      esT("deviceAddress"), 
       pane->m_edAddr, 
       pane->m_lblAddr
     )
   );
 	src->link(
-    EsSpinCtlPropertyLink::create(
-      esT("targetPort"), 
-      pane->m_edPort, 
-      pane->m_lblPort
+    EsTextCtlPropertyLink::create(
+      esT("deviceName"), 
+      pane->m_edName, 
+      pane->m_lblName
     )
   );
 	src->link(
-    EsSpinCtlPropertyLink::create(
-      esT("operationTimeout"), 
-      pane->m_edTmo, 
-      pane->m_lblTmo
+    EsTextCtlPropertyLink::create(
+      esT("serviceClass"), 
+      pane->m_edSvcClass, 
+      pane->m_lblSvcClass
+    )
+  );
+	src->link(
+    EsTextCtlPropertyLink::create(
+      esT("serviceName"), 
+      pane->m_edSvcName, 
+      pane->m_lblSvcName
     )
   );
 
@@ -174,4 +192,4 @@ EsReflectedClassDataSource* EsChannelIoSocketClientConfigPane::doDataSourceCreat
 }
 //--------------------------------------------------------------------------------
 
-#endif //< ES_COMM_USE_CHANNEL_IO_SOCKET
+#endif //< ES_COMM_USE_CHANNEL_BLUETOOTH

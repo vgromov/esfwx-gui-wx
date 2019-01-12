@@ -1,15 +1,15 @@
-#ifndef _socket_client_io_channel_config_pane_
-#define _socket_client_io_channel_config_pane_
+#ifndef _es_channel_io_bluetooth_le_config_pane_
+#define _es_channel_io_bluetooth_le_config_pane_
 
-#ifdef ES_COMM_USE_CHANNEL_IO_SOCKET
+#ifdef ES_COMM_USE_CHANNEL_BLUETOOTH_LE
 
-class ESCOMM_GUI_CLASS ES_INTF_IMPL_DERIVED(EsChannelIoSocketClientConfigPane, EsReflectedClassConfigPane)
+class ESCOMM_GUI_CLASS ES_INTF_IMPL_DERIVED(EsChannelIoBluetoothLeConfigPane, EsReflectedClassConfigPane)
 
 protected:
   class ConfigPaneWnd : public PaneWnd 
   {
   protected:
-    ConfigPaneWnd(EsChannelIoSocketClientConfigPane& pane, wxWindow* parent);
+    ConfigPaneWnd(EsChannelIoBluetoothLeConfigPane& pane, wxWindow* parent);
 
   public:
     virtual ~ConfigPaneWnd();
@@ -22,17 +22,14 @@ protected:
 	  wxButton* m_reset;
 	  wxTextCtrl* m_edAddr;
 	  wxStaticText* m_lblAddr;
-	  wxSpinCtrl* m_edPort;
-	  wxStaticText* m_lblPort;
-	  wxSpinCtrl* m_edTmo;
-	  wxStaticText* m_lblTmo;
+	  wxCheckBox* m_edSubscribe;
 
-    friend class EsChannelIoSocketClientConfigPane;
+    friend class EsChannelIoBluetoothLeConfigPane;
   };
 
 public:
   static EsReflectedObjectConfigPaneIntf::Ptr create(wxWindow* parent);
-	virtual ~EsChannelIoSocketClientConfigPane();
+	virtual ~EsChannelIoBluetoothLeConfigPane();
 
   /// Necessary EsBaseIntf implementation
   ///
@@ -45,6 +42,6 @@ protected:
 
 ES_INTF_IMPL_END
 
-#endif //< ES_COMM_USE_CHANNEL_IO_SOCKET
+#endif //< ES_COMM_USE_CHANNEL_BLUETOOTH_LE
 
-#endif //< _socket_client_io_channel_config_pane_
+#endif //< _es_channel_io_bluetooth_le_config_pane_

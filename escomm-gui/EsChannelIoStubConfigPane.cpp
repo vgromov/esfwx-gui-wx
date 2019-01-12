@@ -3,11 +3,13 @@
 
 #include "EsChannelIoStubConfigPane.h"
 //--------------------------------------------------------------------------------
+
+#ifdef ES_COMM_USE_CHANNEL_STUB
 //--------------------------------------------------------------------------------
 
 EsString EsChannelIoStubConfigPane::typeNameGet() const ES_NOTHROW
 {
-  return esT("EsChannelIoStubConfigPane");
+  return classNameGetStatic();
 }
 //--------------------------------------------------------------------------------
 
@@ -70,3 +72,5 @@ EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoStubConfigPane::create(wxWindow*
   return ptr.release()->asBaseIntfPtr();
 }
 //--------------------------------------------------------------------------------
+
+#endif //< ES_COMM_USE_CHANNEL_STUB

@@ -1,54 +1,51 @@
 #include "escomm_gui_pch.h"
 #pragma hdrstop
 
-#include "EsChannelIoSocketServerConfigPane.h"
-//--------------------------------------------------------------------------------
+#include "EsChannelIoBluetoothLeConfigPane.h"
 //--------------------------------------------------------------------------------
 
-EsChannelIoSocketServerConfigPane::
-ConfigPaneWnd::ConfigPaneWnd(EsChannelIoSocketServerConfigPane& pane, wxWindow* parent) :
+#ifdef ES_COMM_USE_CHANNEL_BLUETOOTH_LE
+//--------------------------------------------------------------------------------
+
+EsChannelIoBluetoothLeConfigPane::
+ConfigPaneWnd::ConfigPaneWnd(EsChannelIoBluetoothLeConfigPane& pane, wxWindow* parent) :
 PaneWnd(
   pane,
   parent
 ),
 m_reset(nullptr),
-m_lblPort(nullptr),
-m_edPort(nullptr),
-m_lblTmo(nullptr),
-m_edTmo(nullptr)
+m_edAddr(nullptr),
+m_lblAddr(nullptr),
+m_edSubscribe(nullptr)
 {
- m_reset = new wxButton(this, wxID_ANY, _("Reset to defaults"));
+  m_reset = new wxButton(this, wxID_ANY, _("Reset to defaults"));
   ES_ASSERT(m_reset);
+
 	m_layContents->Add(
     m_reset, 
     wxSizerFlags().Border()
   );
 
-	wxFlexGridSizer* ctls = new wxFlexGridSizer(2, 2, 0, 0);
+	wxFlexGridSizer* ctls = new wxFlexGridSizer(3, 2, 0, 0);
 	wxASSERT(ctls);
 	ctls->AddGrowableCol(1, 1);
 	wxSizerFlags lblFlags;
 	lblFlags.Border().CenterVertical().Left();
 
-  m_lblPort = new wxStaticText(this, wxID_ANY, wxEmptyString);
-  ES_ASSERT(m_lblPort);
-  
-  m_edPort = new wxSpinCtrl(this, wxID_ANY);
-  ES_ASSERT(m_edPort);
+  m_edAddr = new wxTextCtrl(this, wxID_ANY);
+  ES_ASSERT(m_edAddr);
 
-	ctls->Add(m_lblPort, lblFlags);
-	ctls->Add(m_edPort, wxSizerFlags(1).Border().Expand());
+  m_lblAddr = new wxStaticText(this, wxID_ANY, wxEmptyString);
+  ES_ASSERT(m_lblAddr);
 
-  m_lblTmo = new wxStaticText(this, wxID_ANY, wxEmptyString);
-  ES_ASSERT(m_lblTmo);
+	ctls->Add(m_lblAddr, lblFlags);
+	ctls->Add(m_edAddr, wxSizerFlags(1).Border().Expand());
+	
+  m_edSubscribe = new wxCheckBox(this, wxID_ANY, wxEmptyString);
+  ES_ASSERT(m_edSubscribe);
+	ctls->Add(m_edSubscribe, wxSizerFlags(1).Border().Expand());
 
-  m_edTmo = new wxSpinCtrl(this, wxID_ANY);
-  ES_ASSERT(m_edTmo);
-
-	ctls->Add(m_lblTmo, lblFlags);
-	ctls->Add(m_edTmo, wxSizerFlags(1).Border().Expand());
-
-	m_layContents->Add(ctls, wxSizerFlags(1).Border(wxALL, 0).Expand());
+  m_layContents->Add(ctls, wxSizerFlags(1).Border(wxALL, 0).Expand());
 
 	m_reset->Bind(
     wxEVT_COMMAND_BUTTON_CLICKED, 
@@ -58,7 +55,7 @@ m_edTmo(nullptr)
 }
 //--------------------------------------------------------------------------------
 
-EsChannelIoSocketServerConfigPane::
+EsChannelIoBluetoothLeConfigPane::
 ConfigPaneWnd::~ConfigPaneWnd()
 {
 	m_reset->Unbind(
@@ -68,12 +65,12 @@ ConfigPaneWnd::~ConfigPaneWnd()
   );
 
   ES_DEBUG_TRACE(
-    esT("EsChannelIoSocketServerConfigPane::~ConfigPaneWnd")
+    esT("EsChannelIoBluetoothLeConfigPane::~ConfigPaneWnd")
   );
 }
 //--------------------------------------------------------------------------------
 
-void EsChannelIoSocketServerConfigPane::
+void EsChannelIoBluetoothLeConfigPane::
 ConfigPaneWnd::onResetToDefaults(wxCommandEvent& evt)
 {
 	m_intf.controlsResetToDefault();
@@ -81,14 +78,14 @@ ConfigPaneWnd::onResetToDefaults(wxCommandEvent& evt)
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
-EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoSocketServerConfigPane::create(wxWindow* parent)
+EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoBluetoothLeConfigPane::create(wxWindow* parent)
 {
-  std::unique_ptr<EsChannelIoSocketServerConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoSocketServerConfigPane );
+  std::unique_ptr<EsChannelIoBluetoothLeConfigPane> ptr = ES_MAKE_UNIQUE( EsChannelIoBluetoothLeConfigPane );
   ES_ASSERT(ptr);
 
   ptr->init(
     parent,
-    EsChannelIoSocketServer::classNameGetStatic(),
+    EsChannelIoBluetoothLE::classNameGetStatic(),
     nullptr
   );
 
@@ -96,19 +93,19 @@ EsReflectedObjectConfigPaneIntf::Ptr EsChannelIoSocketServerConfigPane::create(w
 }
 //--------------------------------------------------------------------------------
 
-EsChannelIoSocketServerConfigPane::~EsChannelIoSocketServerConfigPane()
+EsChannelIoBluetoothLeConfigPane::~EsChannelIoBluetoothLeConfigPane()
 {
-  ES_DEBUG_TRACE(esT("EsChannelIoSocketServerConfigPane::~EsChannelIoSocketServerConfigPane"));
+  ES_DEBUG_TRACE(esT("EsChannelIoBluetoothLeConfigPane::~EsChannelIoBluetoothLeConfigPane"));
 }
 //--------------------------------------------------------------------------------
 
-EsString EsChannelIoSocketServerConfigPane::typeNameGet() const ES_NOTHROW
+EsString EsChannelIoBluetoothLeConfigPane::typeNameGet() const ES_NOTHROW
 {
   return classNameGetStatic();
 }
 //--------------------------------------------------------------------------------
 
-EsReflectedClassConfigPane::PaneWnd* EsChannelIoSocketServerConfigPane::doPaneWndCreate(wxWindow* parent)
+EsReflectedClassConfigPane::PaneWnd* EsChannelIoBluetoothLeConfigPane::doPaneWndCreate(wxWindow* parent)
 {
   PaneWnd* wnd = new ConfigPaneWnd(
     *this, 
@@ -120,7 +117,7 @@ EsReflectedClassConfigPane::PaneWnd* EsChannelIoSocketServerConfigPane::doPaneWn
 }
 //--------------------------------------------------------------------------------
 
-EsReflectedClassDataSource* EsChannelIoSocketServerConfigPane::doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta)
+EsReflectedClassDataSource* EsChannelIoBluetoothLeConfigPane::doDataSourceCreate(const EsString& className, const EsMetaclassIntf::Ptr& meta)
 {
   ConfigPaneWnd* pane = wxDynamicCast( m_pane.get(), ConfigPaneWnd );
   ES_ASSERT(pane);
@@ -135,20 +132,21 @@ EsReflectedClassDataSource* EsChannelIoSocketServerConfigPane::doDataSourceCreat
 
 	// initialize property links
 	src->link(
-    EsSpinCtlPropertyLink::create(
-      esT("port"), 
-      pane->m_edPort, 
-      pane->m_lblPort
+    EsTextCtlPropertyLink::create(
+      esT("deviceAddress"), 
+      pane->m_edAddr, 
+      pane->m_lblAddr
     )
   );
 	src->link(
-    EsSpinCtlPropertyLink::create(
-      esT("operationTimeout"), 
-      pane->m_edTmo, 
-      pane->m_lblTmo
+    EsCheckBoxPropertyLink::create(
+      esT("subscribeToNotifications"), 
+      pane->m_edSubscribe
     )
   );
 
   return src.release();
 }
 //--------------------------------------------------------------------------------
+
+#endif //< ES_COMM_USE_CHANNEL_BLUETOOTH_LE
