@@ -1,0 +1,142 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-06-19 21:35+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "&Cancel"
+msgstr ""
+
+msgid "Abort"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Clear application information log"
+msgstr ""
+
+msgid "Clear application log"
+msgstr ""
+
+msgid "Clear log"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Config"
+msgstr ""
+
+msgid "Configure"
+msgstr ""
+
+msgid "Confirmation"
+msgstr ""
+
+msgid "Data"
+msgstr ""
+
+msgid "Dump log"
+msgstr ""
+
+msgid "Error"
+msgstr ""
+
+msgid "EsListViewModelBase::recordsFind: Both arguments must be of the same size"
+msgstr ""
+
+msgid "Extra"
+msgstr ""
+
+msgid "File"
+msgstr ""
+
+msgid "File:"
+msgstr ""
+
+msgid "Folder:"
+msgstr ""
+
+msgid "Ignore"
+msgstr ""
+
+msgid "Information"
+msgstr ""
+
+msgid "Level"
+msgstr ""
+
+msgid "Log dump folder"
+msgstr ""
+
+msgid "Log to file"
+msgstr ""
+
+msgid "Message"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "No to all"
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Perform log automatic dump to file"
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "Retry"
+msgstr ""
+
+msgid "Save application log to file"
+msgstr ""
+
+msgid "Save log"
+msgstr ""
+
+#, c-format
+msgid "Select '%s' user interface language"
+msgstr ""
+
+msgid "Select dump folder for automatic log dump"
+msgstr ""
+
+msgid "Timestamp"
+msgstr ""
+
+msgid "Toggle application information logging to file"
+msgstr ""
+
+msgid "Warning"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "Yes to all"
+msgstr ""

@@ -1,0 +1,86 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-10 09:24+0300\n"
+"PO-Revision-Date: 2020-04-10 09:28+0300\n"
+"Last-Translator: Vsevolod V Gromov <gromov.vsevolod@yandex.ru>\n"
+"Language-Team: \n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.3\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 "
+"&& (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+#, c-format
+msgid "Save '%s'"
+msgstr "Сохранить '%s'"
+
+#, c-format
+msgid ""
+"A document\n"
+"'%s'\n"
+"has unsaved changes.\n"
+"Do you want to save it?"
+msgstr ""
+"Документ\n"
+"'%s'\n"
+"имеет несохраненные изменения.\n"
+"Вы хотите сохранить его?"
+
+msgid "Save document"
+msgstr "Сохранить документ"
+
+#, c-format
+msgid ""
+"A document\n"
+"'%s'\n"
+"could not be saved to '%s',\n"
+"because it is already open in another window."
+msgstr ""
+"Документ\n"
+"'%s'\n"
+"не может быть сохранена до '%s',\n"
+"потому что он уже открыт в другом окне."
+
+msgid "Document with same name already open"
+msgstr "Документ с тем же именем уже открыт"
+
+msgid "Open document"
+msgstr "Открыть документ"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Close document, selected in list"
+msgstr "Закрыть документ, выбранный в списке"
+
+msgid "Close all"
+msgstr "Закрыть все"
+
+msgid "Close all open documents"
+msgstr "Закрыть все открытые документы"
+
+#, c-format
+msgid ""
+"Could not find registered document type for file extension '%s'. File type "
+"unknown or is not supported."
+msgstr ""
+"Не удалось найти зарегистрированный тип документа для расширения файла '%s'. Тип "
+"файла неизвестен или не поддерживается."
+
+msgid "Name"
+msgstr "Имя"
+
+msgid "Path"
+msgstr "Путь"
+
+msgid "Type"
+msgstr "Тип"

@@ -1,0 +1,132 @@
+ cmake/FindPLplot.cmake | 30 +++++++++++++++++++++---------
+ drivers/wxwidgets.h    |  9 +--------
+ include/plcore.h       |  2 --
+ lib/csa/nan.h          |  8 ++++----
+ 4 files changed, 26 insertions(+), 23 deletions(-)
+
+diff --git a/cmake/FindPLplot.cmake b/cmake/FindPLplot.cmake
+index 611567f37..ba4a96b05 100644
+--- a/cmake/FindPLplot.cmake
++++ b/cmake/FindPLplot.cmake
+@@ -15,7 +15,7 @@ FIND_PATH(
+ 
+ IF( PLplot_INCLUDE_DIR )
+   find_library( PLplot_LIBRARY
+-    NAMES plplotd
++    NAMES plplot plplotd
+     PATHS /usr/local/lib /usr/lib
+   )
+   if(PLplot_LIBRARY)
+@@ -29,7 +29,7 @@ IF( PLplot_INCLUDE_DIR )
+ 
+   # find cxx bindings
+   find_library( PLplot_cxx_LIBRARY
+-    NAMES plplotcxxd
++    NAMES plplotcxx plplotcxxd
+     PATHS /usr/local/lib /usr/lib
+   )
+   if( PLplot_cxx_LIBRARY )
+@@ -38,26 +38,38 @@ IF( PLplot_INCLUDE_DIR )
+ 
+   # find f90 bindings
+   find_library( PLplot_f90_LIBRARY
+-    NAMES plplotf90d
++    NAMES plplotf90 plplotf90d
+     PATHS /usr/local/lib /usr/lib
+   )
+   if( PLplot_f90_LIBRARY )
+     set( PLplot_LIBRARIES ${PLplot_LIBRARIES} ${PLplot_f90_LIBRARY} )
+   endif( PLplot_f90_LIBRARY )
+ 
+-  # find wxwidgets bindings
+-  find_library( PLplot_wxwidgets_LIBRARY
+-    NAMES plplotwxwidgetsd
++  # find extra libraries
++  #
++  find_library( PLplot_csirocsa_LIBRARY
++    NAMES csirocsa csirocsad
+     PATHS /usr/local/lib /usr/lib
+   )
+-  if( PLplot_wxwidgets_LIBRARY )
+-    set( PLplot_LIBRARIES ${PLplot_LIBRARIES} ${PLplot_wxwidgets_LIBRARY} )
+-  endif( PLplot_wxwidgets_LIBRARY )
++  if( PLplot_csirocsa_LIBRARY )
++    set( PLplot_EXTRA_LIBRARIES ${PLplot_EXTRA_LIBRARIES} ${PLplot_csirocsa_LIBRARY} )
++  endif()
++
++  find_library( PLplot_qsastime_LIBRARY
++    NAMES qsastime qsastimed
++    PATHS /usr/local/lib /usr/lib
++  )
++  if( PLplot_qsastime_LIBRARY )
++    set( PLplot_EXTRA_LIBRARIES ${PLplot_EXTRA_LIBRARIES} ${PLplot_qsastime_LIBRARY} )
++  endif()
++  
+ endif(PLplot_INCLUDE_DIR)
+ 
+ if(PLplot_FOUND)
+   if(NOT PLplot_FIND_QUIETLY)
+     message(STATUS "FindPLplot: Found both PLplot headers and library")
++    message(STATUS "PLplot_LIBRARIES=>${PLplot_LIBRARIES}")
++    message(STATUS "PLplot_EXTRA_LIBRARIES=>${PLplot_EXTRA_LIBRARIES}")
+   endif(NOT PLplot_FIND_QUIETLY)
+ else(PLplot_FOUND)
+   if(PLplot_FIND_REQUIRED)
+diff --git a/drivers/wxwidgets.h b/drivers/wxwidgets.h
+index 1d0706bf0..259218253 100644
+--- a/drivers/wxwidgets.h
++++ b/drivers/wxwidgets.h
+@@ -188,14 +188,7 @@ private:
+     //variables for dealing with sending/receiving commands
+     //via a memory map
+     char m_mfo[PLPLOT_MAX_PATH];
+-#ifdef PL_WXWIDGETS_IPC3
+-    // Private variable to hold all components of a MemoryMapHeader struct for a wxPLDevice instance.
+-    MemoryMapHeader m_header;
+-#else
+-    PLNamedMutex    m_mutex;
+-#endif
+-    size_t          m_localBufferPosition;
+-    PLMemoryMap     m_outputMemoryMap;
++    size_t m_localBufferPosition;
+ };
+ 
+ 
+diff --git a/include/plcore.h b/include/plcore.h
+index 8a08eea33..3fddfbe3f 100644
+--- a/include/plcore.h
++++ b/include/plcore.h
+@@ -238,9 +238,7 @@ static PLDispatchInit  static_device_initializers[] = {
+ #if defined ( PLD_wxpng ) && !defined ( ENABLE_DYNDRIVERS )
+     plD_dispatch_init_wxpng,
+ #endif
+-#if defined ( PLD_wxwidgets ) && !defined ( ENABLE_DYNDRIVERS )
+     plD_dispatch_init_wxwidgets,
+-#endif
+ #if defined ( PLD_xfig ) && !defined ( ENABLE_DYNDRIVERS )
+     plD_dispatch_init_xfig,
+ #endif
+diff --git a/lib/csa/nan.h b/lib/csa/nan.h
+index fc55b852a..dbb566808 100644
+--- a/lib/csa/nan.h
++++ b/lib/csa/nan.h
+@@ -42,15 +42,15 @@ static unsigned _int64 lNaN = ( (unsigned _int64) 1 << 63 ) - 1;
+ // MSVC/C++ 2003 reports a version 1300
+ //
+ #include <float.h>
+-#include <ymath.h>
++#include <math.h>
+ #undef NaN
+ #if _MSC_VER < 1300
+-#define NaN         _Nan._D
++#define NaN         nan("")//_Nan._D
+ #else
+-#define NaN         _Nan._Double
++#define NaN         nan("")//_Nan._Double
+ #endif
+ 
+-#define isnan       _isnan
++//#define isnan       _isnan
+ #define copysign    _copysign
+ 
+ #endif
